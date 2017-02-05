@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% load static %}
+{% block first %}
+<div class="jumbotron">
+	<h2>Todo</h2>
+</div>
+<ul>
+	<li>Make comment line unclickable in submission view</li>
+	<li>Rating button not clickable for some users (double comment, submission owner...)</li>
+</ul>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %} {% endblock %}

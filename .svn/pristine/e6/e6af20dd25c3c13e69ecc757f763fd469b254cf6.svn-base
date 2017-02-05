@@ -1,0 +1,21 @@
+{% extends "index.html" %}
+
+{% block title %}Login / Logout{% endblock %}
+{% block first %}
+
+    <h1>Create an account</h1>
+
+   <!-- no action specified = same page with different method -->
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Create the account">
+    </form>
+
+
+{% endblock %}
+
+
+{% block second %}
+
+{% endblock %}

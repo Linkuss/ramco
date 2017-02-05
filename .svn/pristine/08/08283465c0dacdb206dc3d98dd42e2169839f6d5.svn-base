@@ -1,0 +1,24 @@
+__author__ = 'vince'
+from django.db import models
+from django.contrib.auth.models import User
+
+class Profile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    confirmation_code = models.CharField(max_length=50)
+    
+    
+class Language(models.Model):
+    SyntaxHighlighter = models.CharField(max_length=20)
+    Name = models.CharField(max_length=10)
+    
+     
+class Submission(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+    language = models.ForeignKey(Language)
+    #language = models.CharField(max_length=10)
+    code = models.CharField(max_length=5000) #a changer, maybe more
+    date = models.DateField(auto_now=True)
+    user = models.ForeignKey(User)
+    #rating missing
+    #What, no

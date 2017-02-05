@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+
+{% block css %}
+
+.table th, .table td {
+border-top: none;
+}
+{% endblock %}
+
+
+{% block title %}View sumbission {{ sub.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ sub.title }}</h2>
+
+
+    <h4>Description: </h4>
+    <div class="well">
+        {{ sub.description }}
+    </div>
+    <br>
+
+    <h4>Code: </h4>
+
+    <div>
+       <pre class="prettyprint">{{ sub.code }}</pre>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block second %}
+    <h3>Comments:</h3>
+    {% for comment in comments  %}
+
+        <div class="well">
+            <table class="table">
+                <tbody>
+                <!-- Results table headers -->
+                <tr>
+                    <td><h4>{{comment.user.username}}, the {{ comment.date }} commented:</h4></td>
+                    <td>Rating:</td>
+                </tr>
+                <tr>
+                    <td>{{ comment.comment }}</td>
+                    <td><div id="rating" class="rating"><h2>{{ comment.rating }}</h2></div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    {% endfor %}
+{% endblock %}
+
+{% block third %}
+    <div class="title">
+        <a class="btn btn-large btn-success" href="rating">Add a comment</a>
+    </div>
+{% endblock %}
+
+{% block javascript %} {% endblock %}

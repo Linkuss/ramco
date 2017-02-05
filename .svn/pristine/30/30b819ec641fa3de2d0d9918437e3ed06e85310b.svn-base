@@ -1,0 +1,177 @@
+{% extends "index.html" %}
+{% load static %}
+{% block first %}
+<div class="jumbotron">
+	<h2>Changelog</h2>
+</div>
+
+
+<div>
+	<h3>v 0.2.3</h3>
+	<div class="alert alert-block"><h4>Warning</h4>The database was wiped for this update, you must redo your account</div>
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+    		<tr class="info">
+        		<th>Type</th>
+          	  	<th>Description</th>
+        	</tr>
+        </thead> 
+        <tbody>
+        <tr>
+            <td style="width:10%"><span class="badge badge-success">new feature</span></td>
+            <td style="width:90%">You can now see the difference between your code and the one someone submitted.</td>
+        </tr>
+        <tr>
+            <td style="width:10%"><span class="badge badge-success">new feature</span></td>
+            <td style="width:90%">Nice notification when people comment on your code.</td>
+        </tr>
+        <tr>
+            <td style="width:10%"><span class="badge badge-info">fix</span></td>
+            <td style="width:90%">Fixed syntax highlighting bug, it now works everywhere and with any language</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-info">fix</span></td>
+            <td>Fixed bug "Clicking multiple times on the code button...."</td>
+        </tr>
+        </tbody>
+        </table>
+</div>
+
+<div>
+	<h3>v 0.2.2</h3>
+	<div class="alert alert-block"><h4>Warning</h4>Due to a modification in the database, the data of the submissions and reviews was erased. Please submit your codes again!</div>
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+    		<tr class="info">
+        		<th>Type</th>
+          	  	<th>Description</th>
+        	</tr>
+        </thead> 
+        <tbody>
+        <tr>
+            <td style="width:10%"><span class="badge badge-success">new feature</span></td>
+            <td style="width:90%">The text area for the codes is now done with the codemirror, with the line number.</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-success">new feature</span></td>
+            <td>You can now submit you own code during a review et see it in the submission page !</td>
+        </tr>
+        <tr>
+			<td><span class="badge badge-info">fix</span></td>
+        	<td>Fixed the tags bugs. It is now possible to set tags for comments and view the tags of the comments.</td>
+        </tr>
+        <tr>
+			<td><span class="badge badge-info">fix</span></td>
+        	<td>The mean rating and number of comments is now displayed on the index paged</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-info">fix</span></td>
+            <td>The rating must now be between 0 and 10</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-important">known bug</span></td>
+            <td>You can comment your own code</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-important">known bug</span></td>
+            <td>Clicking multiples times on the code button in a submission will cause the code to stack instead of being replaced.</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-important">known bug</span></td>
+            <td>Syntax highlighting not working everywhere.</td>
+        </tr>
+        </tbody>
+        </table>
+</div>
+<div>
+	<h3>v 0.2.1</h3>
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+    		<tr class="info">
+        		<th>Type</th>
+          	  	<th>Description</th>
+        	</tr>
+        </thead> 
+        <tbody>
+        <tr>
+            <td style="width:10%"><span class="badge badge-success">new feature</span></td>
+            <td style="width:90%">You can now make and view comments</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-important">known bug</span></td>
+            <td>Update on home page of n° comments and rating not working</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-important">known bug</span></td>
+            <td>Tags not working, will cause bug</td>
+        </tr>
+        </tbody>
+        </table>
+</div>
+
+<div>
+	<h3>v 0.2</h3>
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+    		<tr class="info">
+        		<th>Type</th>
+          	  	<th>Description</th>
+        	</tr>
+        </thead> 
+        <tbody>
+        	<tr>
+        		<td style="width:10%"><span class="badge badge-success">new feature</span></td>
+        		<td style="width:90%">Changelog and footer added</td>
+        	</tr>
+        	<tr>
+				<td><span class="badge badge-info">fix</span></td>
+        		<td>The code in the submissions view is now correctly formatted and has syntax highlighting</td>
+        	</tr>
+        	<tr>
+				<td><span class="badge badge-info">fix</span></td>
+        		<td>Email is now unique</td>
+        	</tr>
+        </tbody>
+	</table>
+</div>
+
+<div>
+	<h3>v 0.1</h3>
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+    		<tr class="info">
+        		<th>Type</th>
+          	  	<th>Description</th>
+        	</tr>
+        </thead> 
+        <tbody>
+        	<tr>
+        		<td style="width:10%"><span class="badge badge-success">new feature</span></td>
+        		<td style="width:90%">You can now register and log to the site</td>
+        	</tr>
+        	<tr>
+        		<td><span class="badge badge-success">new feature</span></td>
+        		<td>Activation of account by email</td>
+        	</tr>
+        	<tr>
+        		<td><span class="badge badge-success">new feature</span></td>
+        		<td>You can submit a code</td>
+        	</tr>
+        	<tr>
+        		<td><span class="badge badge-success">new feature</span></td>
+        		<td>You can visualise submissions</td>
+        	</tr>
+        	<tr>
+        		<td><span class="badge badge-important">known bug</span></td>
+        		<td>Email is not unique</td>
+        	</tr>
+        	<tr>
+        		<td><span class="badge badge-important">known bug</span></td>
+        		<td>Code doesn't retain his formatting</td>
+        	</tr>
+        </tbody>    
+	</table>
+</div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %} {% endblock %}

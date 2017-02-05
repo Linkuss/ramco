@@ -1,0 +1,12 @@
+{% extends "login.html" %}
+
+
+{% block first %}
+
+    <p>Thank you for checking out our site. See you soon!</p>
+
+{% endblock %}
+
+{% block second %}
+
+{% endblock %}

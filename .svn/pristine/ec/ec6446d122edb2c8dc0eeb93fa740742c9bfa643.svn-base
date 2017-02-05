@@ -1,0 +1,47 @@
+{% extends "index.html" %}
+
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+
+   <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" id="submit"  value="Rate my code">
+    </form>
+{% endblock %}
+
+
+{% block second %}
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true
+            });
+
+            var bt = document.getElementById("submit");
+
+            var area = document.getElementById("id_code");
+
+            $(bt).click(function(){
+                area.value = myCodeMirror.getValue();
+            });
+
+
+
+
+        });
+    </script>
+
+
+
+{% endblock %}

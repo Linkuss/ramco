@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+
+{% block title %}Submission{% endblock %}
+
+{% block navbar %}
+    <div class="masthead">
+        <h3 class="muted">RAMCO - Rate My Code !</h3>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="container">
+                    <ul class="nav">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Reviews</a></li>
+                        <li><a href="#">MyReviews / MyRequests</a></li>
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Login / Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div><!-- /.navbar -->
+    </div>
+{% endblock %}
+
+{% block first %}
+
+<div>
+    <form action="/contact/" method="post">
+    	{% csrf_token %}
+		{{ form.as_p }}
+		
+		<input type="Submit" value="Rate my Code" />
+	</form>
+ </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+{% load static %}
+{% block first %}
+<div class="row-fluid">
+	<div class="span8 offset2" id="tasks">
+		<div align="center"><h2>Todos</h2></div>
+		<br>
+		<div>
+			<div class="item">
+				Rating button not clickable for some users (double comment, submission owner...)
+			</div>
+			<div class="item">
+				implement request and cross-rating...
+			</div>
+			<div class="item">
+				implement profile...
+			</div>
+			<div class="item">
+				implement review page...
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %} 
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "index.html" %}
+{% load static %}
+{% block css %}
+
+{% endblock %}
+
+
+{% block title %}View CrossRating results - {{ aRequest.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ aRequest.title }}</h2>
+
+
+    <h4>Requested by: {{ aRequest.user.username }}</h4>
+
+    <br>
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ aRequest.description }}
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+    {% if crossRating.reqAnswer.code %}
+        <h4>Code: </h4>
+        <div id="code" >
+        <textarea id="id_code">{{ crossRating.reqAnswer.code }}</textarea>
+
+
+        </div>
+    {% else %}
+        <div class="text-info">
+            No code has been submitted.
+        </div>
+    {% endif %}
+
+    <h4>Language: </h4>{{ aRequest.language }}
+{% endblock %}
+
+{% block third %}
+    <h4>Your comment:</h4>
+
+    {{ crossRating.comment }}
+
+    <h4>Your rating:</h4>
+    {{ crossRating.rating }}
+
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-java",
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+
+
+            var line_num;
+            var info;
+            var lineComment;
+            var username;
+            {% for lineComment in line_comments %}
+                username='<b>{{ lineComment.crrating.user.username }}</b>';
+                line_num={{ lineComment.line_n }};
+                info = myCodeMirror.lineInfo(line_num);
+                lineComment= username+ ': '+'{{ lineComment.line_comment }}';
+                if(info.gutterMarkers){
+                    //gutter is present then append
+                    appendMarker(line_num,lineComment);
+                } else {
+                    myCodeMirror.setGutterMarker({{ lineComment.line_n }}, "breakpoints",  makeMarker(line_num,lineComment));
+                }
+
+            {% endfor %}
+            // Tooltip activation
+            $(function () {
+                $("[data-toggle='tooltip']").tooltip();
+            });
+
+
+
+        });
+
+
+
+        function appendMarker(line_n, comment) {
+
+            var tooltip = $("#a_marker_"+line_n);
+            var t_text= tooltip.attr("data-original-title");
+            tooltip.attr("data-original-title",t_text+"\n"+comment );
+            //$("#a_marker_"+line_n).append("<a href='' data-toggle='tooltip' data-placement='top' data-container='body' data-original-title='"+comment+"'>.</a>");
+
+
+        }
+
+        function makeMarker(line_n, comment) {
+            var marker = document.createElement("div");
+            marker.setAttribute("id","marker_"+line_n);
+            marker.style.color = "#822";
+            marker.innerHTML = "<a id='a_marker_"+line_n+"' href='#' data-toggle='tooltip' data-html='true' data-placement='top' data-container='body' data-original-title='"+comment+"'>●</a>";
+            return marker;
+        }
+
+
+    </script>
+
+
+{% endblock %}

@@ -1,0 +1,52 @@
+from django.conf.urls import patterns, include, url
+
+from . import views
+from django.contrib.auth.views import logout
+
+# Uncomment the next two lines to enable the admin:
+from django.contrib import admin
+from django.contrib.auth.forms import AdminPasswordChangeForm
+admin.autodiscover()
+
+
+urlpatterns = patterns('',
+    url(r'^$', views.index, name='index'),
+    url(r'^login/$', 'django.contrib.auth.views.login', {'extra_context': {'navlog': True}, 'template_name': 'login.html'}, name='login'),
+    url(r'^signup/$', views.register, name='register'),
+    url(r'^submitC/$', views.submitC, name='submit code'),
+    url(r'^submitR/$', views.submitR, name='submit request'),
+    url(r'^confirm/(?P<confirmation_code>[^/]+)/(?P<username>[^/]+)/$', views.confirm),
+    url(r'^logout/$', logout, {'extra_context':{'navlog': True}, 'template_name': 'logout.html'}, name='logout'),
+    url(r'^submission/(\d{1,2})/$', views.view_submission, name='submission'),
+    url(r'^submission/(\d{1,2})/delete/(\d{1,2})$', views.deleteReview, name='deleteReview'),
+    url(r'^changelog/$', views.changelog, name='changelog'),
+    url(r'^submission/(\d{1,2})/rating/$', views.rating, name='rating'),
+    url(r'^myReviews/$', views.myReviews, name='my Reviews'),
+    url(r'^myRequests/$', views.myRequests, name='my Requests'),
+    url(r'^myCrossRating/$', views.myCrossRating, name='myCrossRating'),
+    url(r'^todo/$', views.todo, name='todo'),
+    url(r'^request/(\d{1,2})/$', views.view_request, name='request'),
+    url(r'^requestManage/(\d{1,2})/$', views.requestManagement, name='requestManagement'),
+    url(r'^requestManageCR/(\d{1,2})/$', views.requestManagementCR, name='requestManagementCR'),
+    url(r'^requestView/(?P<req_id>\d{1,2})/$', views.view_request, name='viewRequest'),
+    url(r'^closeRequest/(\d{1,2})/$', views.close_request, name='closeRequest'),
+    url(r'^getRequestAnswerCode/(\d{1,2})/(\d{1,2})/$', views.getAnswerCode, name='getReqAnswerCode'),
+    url(r'^profile/$', 'django.contrib.auth.views.password_change', {'extra_context': {'navprof': True}, 'password_change_form': AdminPasswordChangeForm, 'template_name': 'profile.html'}, name='profile'),
+    url(r'^profile/$', 'django.contrib.auth.views.password_change_done', {'template_name': 'profile.html'}, name='change_done'),
+    url(r'^help/$', views.helpPage, name = 'Help'),
+    url(r'^startCrossRating/(\d{1,2})/(\d{1,2})/$', views.start_cross_rating, name='startCR'),
+    url(r'^submissions/$', views.submissions, name = 'submission_list' ),
+    url(r'^key/(\d{1,2})/$', views.reqKey, name='reqKey'),
+    url(r'^requestCrossRating/(\d{1,2})/rating/$', views.crossRating, name='CRrating'),
+    url(r'^viewCrossRating/(\d{1,2})/$', views.view_requestCrossRatig, name='viewCRrating'),
+    url(r'^viewLink/(\d{1,2})/$', views.view_link, name='viewLink'),
+    # Examples:
+    # url(r'^$', 'ramco.views.home', name='home'),
+    # url(r'^ramco/', include('ramco.foo.urls')),
+
+    # Uncomment the admin/doc line below to enable admin documentation:
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:
+    url(r'^admin/', include(admin.site.urls)),
+)

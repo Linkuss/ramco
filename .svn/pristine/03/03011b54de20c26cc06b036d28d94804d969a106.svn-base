@@ -1,0 +1,157 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+
+    <!-- Modal -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Line Comment</h3>
+        </div>
+        <div class="modal-body">
+            You have selected the following line:
+            <div id="clicked_line" class="well well-small">
+
+            </div>
+
+
+            Insert a comment for the selected line:
+            <textarea id="lineArea" style="width:98%"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="lineBt" class="btn btn-primary">Save changes</button>
+        </div>
+    </div>
+
+	<h4>{{ user }}'s Code: </h4>
+
+    <div id="code_container" class="row-fluid">
+       <div id="codediv" class="span12"><textarea id="code"></textarea></div>
+       <pre class="hidden" style="display: none;">{{ userCode }}</pre>
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+	<div id="rating_container">
+   		<form action="" method="post">
+        	{% csrf_token %}
+        	<p>{{ form.comment.label}} {{form.comment }} </p>
+			<p>{{ form.code.label }} {{ form.code }}</p>
+			<p>{{ form.rate.label }} {{ form.rate }}/10</p>
+			<p>{{ form.tagsList.label }} {{ form.tagsList }}</p>
+        	<input id="in_submit" type="submit" class="btn btn-large btn-success" value="Send my comment">
+    	</form>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        var mode="{{ lang.Name }}".toLowerCase();
+
+        var cLine=0;
+
+        $(document).ready(function(){
+           	var code = $('pre').text();
+			var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+            setMode(editor,mode);
+            editor.setValue(code);
+
+
+            editor.on("gutterClick", function(cm, n, gutter) {
+                if(gutter.localeCompare("CodeMirror-linenumbers") == 0){
+                    var nr = n+1;
+                    console.log("Line n°"+nr +" clicked");
+                } else {
+                    var info = cm.lineInfo(n);
+                    cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : makeMarker());
+                    $('#clicked_line').html(info.text);
+                    $('#myModal').modal("show");
+                    cLine=n;
+
+                }
+            });
+
+            function makeMarker() {
+                var marker = document.createElement("div");
+                marker.style.color = "#1FDB18";
+                marker.innerHTML = "●";
+                return marker;
+            }
+
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true
+            });
+
+            setMode(myCodeMirror,mode);
+            var bt = document.getElementById("submit");
+
+            var area = document.getElementById("id_code");
+
+            $(bt).click(function(){
+                myCodeMirror.save();
+                area.value = myCodeMirror.getValue();
+            });
+
+
+
+            $('#lineBt').click(function(){
+                //console.log("LOL");
+                //save in hidden filds the comments
+
+                var comment = $('#lineArea').val();
+
+
+                $('#in_submit').after( $("<input type='hidden' name='line_comment[line_n]' value="+cLine +">"));
+                $('#in_submit').after( $("<input type='hidden' name='line_comment[comment]' value="+comment+">"));
+
+
+                console.log($('#comment').text());
+                $('#myModal').modal("hide");
+
+            });
+
+
+        });
+
+        function setMode(cm, mode) {
+            if(mode !== undefined) {
+                mode = mode.toLowerCase();
+
+                var script = '{% get_static_prefix %}codemirror/mode/'+mode+'/'+mode+'.js';
+
+                $.getScript(script, function() {
+
+                    cm.setOption('mode', mode);
+
+                }).fail(function(){
+                            if(mode.localeCompare("java") == 0 || mode.localeCompare("csharp") ){
+                                mode = "text/x-"+mode;
+                            } else {
+                                mode =  "clike"
+                            }
+                            cm.setOption('mode', mode);
+                        });
+
+            }
+            else cm.setOption('mode', 'clike');
+        }
+    </script>
+
+
+
+{% endblock %}

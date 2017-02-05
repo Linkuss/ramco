@@ -1,0 +1,114 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Submissions{% endblock %}
+{% block first %}
+<div class="container">
+	<h2 style="text-align: center">Codes submitted list</h2><br>
+	<p class="lead">On this section you can see the top codes submitted.</p>
+</div>
+<div>
+	<!--<div class="controls-row">
+      		<b>Filters :</b>
+      	{% for language in languages %}
+	    	<label class="checkbox inline">
+	    		<input id="chbox{{ language }}" type="checkbox" checked="true" value="{{ language }}">{{ language }}</input>
+	    	</label>
+	    {% endfor %}
+	</div>-->
+	<br/>
+	<br/>
+	<table id="subTable" class="table table-striped table-hover table-bordered">
+		<thead>
+	    	<tr class="info">
+	        	<th>Language</th>
+	            <th>Title</th>
+	            <th>Rating</th>
+	            <th>User</th>
+	            <th>Submitted</th>
+	            <th>Nb. of comments</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        {% for sub in sub_list  %}
+	            <tr class="pointer">
+	                <td class="s_id" style="display: none;">{{ sub.id }}</td>
+	                <td>{{ sub.language.Name }}</td>
+	                <td>{{ sub.title }}</td>
+	                <td>{{ sub.meanRating|floatformat:"-2" }}</td>
+	                <td>{{ sub.user }}</td>
+	                <td>{{ sub.date }}</td>
+                    <td>{{ sub.nbrComments }}</td>
+	           </tr>
+	        {% endfor %}
+	    </tbody>
+	</table>
+</div>
+
+<div class="alert alert-block">
+            <strong>Click <a href="{% url 'submit code' %}">here</a> to create a submission</strong>
+        </div>
+{% endblock %}
+{% block second %}
+<a name="requests"></a>
+<div class="container">
+	<h2 style="text-align: center">Open requests list</h2><br>
+	<p class="lead">On this section you can see the open requests where you can submit your code.</p>
+</div>
+<div>
+	<table id="reqTable" class="table table-striped table-hover table-bordered">
+		<thead>
+	    	<tr class="info">
+	        	<th>Language</th>
+	            <th>Title</th>
+	            <th>User</th>
+	            <th>Submitted</th>
+	            <th>Closing date / 
+	             Number of replies</th>
+	            
+	        </tr>
+	    </thead>
+	    <tbody>
+	        {% for req in req_list  %}
+	            <tr class="pointer">
+	                <td class="s_id" style="display: none;">{{ req.id }}</td>
+	                <td>{{ req.language.Name }}</td>
+	                <td>{{ req.title }}</td>
+	                <td>{{ req.user }}</td>
+	                <td>{{ req.date }}</td>
+	                <td>{% if req.endDate %}
+	                		closing on {{ req.endDate }}
+	                	{% else %}
+	                		{{ req.nbrOfReplies }}/{{ req.nbrOfRequiredSubs }}
+	                	{% endif %}		
+	                </td>
+	           </tr>
+	        {% endfor %}
+	    </tbody>
+	</table>
+</div>
+<div class="alert alert-block">
+    <strong>Click <a href="{% url 'submit request' %}">here</a> to create a request</strong>
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript" language="javascript" >
+	$(document).ready(function(){		
+		$("#reqTable tr").click(function() {
+                var $cell=$(this).closest('tr');
+                var id = $(this).closest('tr').children('td.s_id').text();
+                if( !$cell.hasClass('info')){
+                    window.location.href = "../requestView/"+id;
+                }
+        });
+        $("#subTable tr").click(function() {
+                var $cell=$(this).closest('tr');
+                var id = $(this).closest('tr').children('td.s_id').text();
+                if( !$cell.hasClass('info')){
+                    window.location.href = "../submission/"+id;
+                }
+        });
+	});
+</script>
+{% endblock %}

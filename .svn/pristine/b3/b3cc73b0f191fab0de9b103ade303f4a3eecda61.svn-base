@@ -1,0 +1,87 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block css %}
+    body .modal{
+    /* new custom width */
+    width: 650px;
+    }
+{% endblock %}
+
+
+{% block title %}Manage request - {{ aRequest.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ aRequest.title }}</h2>
+
+
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ aRequest.description }}
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+    <h4>Cross rating results: </h4>
+    {% if crossRatings %}
+    <table class="table table-striped table-hover table-bordered pointer">
+        <thead>
+        <tr class="info">
+            <th>Code by</th>
+            <th>Rated by</th>
+            <th>Rating</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cr in crossRatings  %}
+            <tr>
+                <td class="cr_id" style="display: none;">{{ cr.id }}</td>
+                <td>{{ cr.reqAnswer.user }}</td>
+                <td>{{ cr.user }}</td>
+                <td>{{ cr.rating }}</td>
+                <td>{{ cr.date }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert alert-info"><h4>No Cross-Ratings results yet !</h4></div>
+    {% endif %}
+{% endblock %}
+
+{% block third %}
+
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            $('tr').click(function() {
+
+
+                var $cell=$(this).closest('tr');
+
+                var id_c = $(this).closest('tr').children('td.cr_id').text();
+
+                if( !$cell.hasClass('info')){
+                    if(id_c != null){
+                        window.location.href = "../../viewCrossRating/"+id_c;
+                    }
+                }
+            });
+
+        });
+
+    </script>
+
+
+{% endblock %}

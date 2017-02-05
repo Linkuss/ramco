@@ -1,0 +1,41 @@
+from django.conf.urls import patterns, include, url
+
+from . import views
+from django.contrib.auth.views import logout
+
+# Uncomment the next two lines to enable the admin:
+from django.contrib import admin
+from django.contrib.auth.forms import AdminPasswordChangeForm
+admin.autodiscover()
+
+
+urlpatterns = patterns('',
+    url(r'^$', views.index, name='index'),
+    url(r'^login/$', 'django.contrib.auth.views.login', {'extra_context': {'navlog': True}, 'template_name': 'login.html'}, name='login'),
+    url(r'^signup/$', views.register, name='register'),
+    url(r'^submitC/$', views.submitC, name='submit code'),
+    url(r'^submitR/$', views.submitR, name='submit request'),
+    url(r'^confirm/(?P<confirmation_code>[^/]+)/(?P<username>[^/]+)/$', views.confirm),
+    url(r'^logout/$', logout, {'extra_context':{'navlog': True}, 'template_name': 'logout.html'}, name='logout'),
+    url(r'^submission/(\d{1,2})/$', views.view_submission, name='submission'),
+    url(r'^submission/(\d{1,2})/delete/(\d{1,2})$', views.deleteReview, name='deleteReview'),
+    url(r'^changelog/$', views.changelog, name='changelog'),
+    url(r'^submission/(\d{1,2})/rating/$', views.rating, name='rating'),
+    url(r'^myReviews/$', views.myReviews, name='my Reviews'),
+    url(r'^myRequests/$', views.myRequests, name='my Requests'),
+    url(r'^todo/$', views.todo, name='todo'),
+    url(r'^request/(\d{1,2})/$', views.view_request, name='request'),
+    url(r'^profile/$', 'django.contrib.auth.views.password_change', {'extra_context': {'navprof': True}, 'password_change_form': AdminPasswordChangeForm, 'template_name': 'profile.html'}, name='profile'),
+    url(r'^profile/$', 'django.contrib.auth.views.password_change_done', {'template_name': 'profile.html'}, name='change_done'),
+    (r'^selectable/', include('selectable.urls')),
+    url(r'^users/$', views.ajax_user_search, name = 'demo_user_search' ),
+    # Examples:
+    # url(r'^$', 'ramco.views.home', name='home'),
+    # url(r'^ramco/', include('ramco.foo.urls')),
+
+    # Uncomment the admin/doc line below to enable admin documentation:
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:
+    url(r'^admin/', include(admin.site.urls)),
+)

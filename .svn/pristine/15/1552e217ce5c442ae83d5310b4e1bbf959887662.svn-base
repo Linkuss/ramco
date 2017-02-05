@@ -1,0 +1,120 @@
+{% extends "index.html" %}
+{% load static %}
+{% load tag_range %}
+{% block css %}
+
+{% endblock %}
+
+
+{% block title %}Manage request - {{ aRequest.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ aRequest.title }}</h2>
+
+
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ aRequest.description }}
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+    <h4>Submitted codes {% if aRequest.nbrOfRequiredSubs %}({{ aRequest.nbrOfReplies }} / {{ aRequest.nbrOfRequiredSubs }}): {% else %} ({{ aRequest.nbrOfReplies }}): {% endif %} </h4>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr class="info">
+            <th>Username</th>
+            <th>Code</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for rUser in aRequest.userList.all  %}
+            <tr class="pointer">
+                <td class="s_id" style="display: none;">{{ rUser.id }}</td>
+                <td>{{ rUser.username }}</td>
+                <td>TODO  </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block third %}
+
+    <div class="title" style="text-align: center">
+        <button class="btn btn-primary" id="closeReq"  type="button">Close this request</button>
+
+        <button class="btn btn-primary" id="startCR" type="button">Start cross-rating</button>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Start Cross-Rating</h3>
+        </div>
+        <div class="modal-body">
+            <div class="alert">
+                <strong>Warning!</strong> This action will close the request.
+            </div>
+
+            There are {{ aRequest.nbrOfReplies }} answers to your request, please select the number of codes one must rate:
+            <div class="btn-group">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    0
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    {% for i in aRequest.nbrOfReplies|get_range %}
+                        <li>{{ i }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="saveBT" class="btn btn-primary">Start Cross-Rating</button>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            $('#startCR').click(function(){
+
+                $('#myModal').modal("show");
+
+            });
+
+            $('#saveBT').click(function(){
+
+               //TODO start cross rating
+
+            });
+
+            $('#closeReq').click(function(){
+
+                //TODO close request
+
+            });
+
+
+
+        });
+
+    </script>
+
+
+{% endblock %}

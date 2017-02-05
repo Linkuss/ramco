@@ -1,0 +1,101 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+    <h2 style="text-align: center">Submission of code</h2><br>
+
+<div class="controls-row">
+	<label class="control-label"><b>Please select the type of submission :</b></label>
+	<label class="radio inline"><input type="radio" name="group" id="rateRadio" value="Rate" checked="true"/>Rate <span id="tooltipRate" data-placement="bottom" data-toggle="tooltip" title="By choosing Rate you submit your code to other user's reviews" class="question">?</span></label>
+	<label class="radio inline"><input type="radio" name="group" id="reqRadio" value="Request" />Request <span id="tooltipRequest" data-placement="bottom" data-toggle="tooltip" title="By choosing Request your want other user to submit a code to you based on a description you will give them. You can then use cross-rating." class="question">?</span></label>
+</div>
+   
+{% endblock %}
+
+
+{% block second %}
+	<form action="" method="post">
+        {% csrf_token %}
+        <p><label><b>{{ form.title.label }}:</b></label> {{  form.title }}</p>
+        <p><label><b>{{ form.description.label }}:</b></label> {{  form.description }}</p>
+        <p><label><b>{{ form.language.label }}:</b></label> {{  form.language }}</p>
+        <p><label><b>{{ form.code.label }}:</b></label> {{  form.code }}</p>
+
+        <div class="title">
+            <br>
+            <br>
+            <input class="btn btn-large btn-success reduce" type="submit" id="submit"  value="Rate my code">
+        </div>
+    </form>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+    
+
+        $(document).ready(function(){
+
+			$('#tooltipRate').tooltip();
+			$('#tooltipRequest').tooltip();
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-java"
+            });
+
+            var bt = document.getElementById("submit");
+
+            var area = document.getElementById("id_code");
+
+            $(bt).click(function(){
+                myCodeMirror.save();
+                area.value = myCodeMirror.getValue();
+            });
+
+
+            $("select").change( function () {
+                var option = $("select").val();
+                //load static js to higlight
+
+                setMode(myCodeMirror,option);
+            });
+            
+            $("input[name=group]:radio").change(function () {
+				if($("#rateRadio").prop("checked")){
+					window.location.href = "{% url 'submit code' %}";
+				}else if($("#reqRadio").prop("checked")){
+					window.location.href = "{% url 'submit request' %}";
+				}
+    		});
+
+        });
+
+
+        function setMode(cm, mode) {
+            if(mode !== undefined) {
+                mode = mode.toLowerCase();
+
+
+                var script = '{% get_static_prefix %}codemirror/mode/'+mode+'/'+mode+'.js';
+
+                $.getScript(script, function() {
+
+                        cm.setOption('mode', mode);
+
+                }).fail(function(){
+                            if(mode.localeCompare("java") == 0 || mode.localeCompare("csharp") ){
+                                mode = "text/x-"+mode;
+                            } else {
+                                mode =  "clike"
+                            }
+                            cm.setOption('mode', mode);
+                        });
+
+            }
+            else cm.setOption('mode', 'clike');
+        }
+    </script>
+{% endblock %}

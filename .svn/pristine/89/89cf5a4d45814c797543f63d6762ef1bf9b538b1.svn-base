@@ -1,0 +1,72 @@
+{% extends "index.html" %}
+
+{% block title %}Login / Logout{% endblock %}
+
+{% block navbar %}
+    <div class="masthead">
+        <h3 class="muted">RAMCO - Rate My Code !</h3>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="container">
+                    <ul class="nav">
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Reviews</a></li>
+                        <li><a href="#">MyReviews / MyRequests</a></li>
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li class="active"><a href="../login">Login / Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div><!-- /.navbar -->
+    </div>
+{% endblock %}
+
+
+{% block first %}
+
+    {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <h1>Create an account</h1>
+
+   <!-- no action specified = same page with different method -->
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Create the account">
+    </form>
+
+
+{% endblock %}
+
+<script type="text/javascript">
+    jQuery(function(){
+        $("#submit").click(function(){
+            $(".error").hide();
+            var hasError = false;
+            var passwordVal = $("#password1").val();
+            var checkVal = $("#password2").val();
+            if (passwordVal == '') {
+                $("#password1").after('<span class="error">Please enter a password.</span>');
+                hasError = true;
+            } else if (checkVal == '') {
+                $("#password2").after('<span class="error">Please re-enter your password.</span>');
+                hasError = true;
+            } else if (passwordVal != checkVal ) {
+                $("#password2).after('<span class="error">Passwords do not match.</span>');
+                hasError = true;
+            }
+            if(hasError == true) { return false; }
+            else {
+                $("#submit").after('<span class="error">Passwords accepted.</span>');
+                return false;
+            }
+        });
+    });
+</script>
+
+{% block second %}
+
+{% endblock %}

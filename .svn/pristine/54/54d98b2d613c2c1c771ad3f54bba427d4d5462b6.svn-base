@@ -1,0 +1,48 @@
+{% extends "index.html" %}
+
+{% block title %}Login / Logout{% endblock %}
+
+{% block first %}
+		<div>
+            {% if messages %}
+    		    {% for message in messages %}
+    			    <div {% if message.tags %}class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+    		    {% endfor %}
+		    {% endif %}
+            {% if form.errors %}
+                {% for key, value in form.errors.items %}
+                    {% for error in value %}
+                        <div class="alert alert-error">{{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>Username</td>
+                    <td> : {{ form.username }}</td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td> : {{ form.password }}</td>
+                </tr>
+            </table>
+
+            <input type="submit" value="login" />
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+
+{% endblock %}
+
+{% block second %}
+<h3>You don't have an account? Sing up <a href="../signup">here</a> to get access</h3>
+
+
+{% endblock %}
+
+{% block javascript %} {% endblock %}

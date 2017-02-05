@@ -1,0 +1,77 @@
+{% extends "index.html" %}
+
+{% block css %}
+
+    fieldset#inputs{ /* contour des inputs */
+    padding: 10px;
+    margin: 0px;
+    width: 400px;
+    background-color: #C8BCB6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#C8BCB6), to(#B3A39A));
+    background: -webkit-repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, .05) 10px, rgba(0, 0, 0, .05) 20px),-webkit-linear-gradient(top, rgb(14, 185, 218), rgb(31, 74, 165));
+    background: -moz-repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.05) 10px, rgba(0, 0, 0, 0.05) 20px) repeat scroll 0 0%, -moz-linear-gradient(center top , #C8BCB6, #B3A39A);
+    background: -ms-repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0,.05) 10px, rgba(0, 0, 0,.05) 20px),-ms-linear-gradient(top, #C8BCB6, #B3A39A);
+    background: -o-repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0,.05) 10px, rgba(0, 0, 0,.05) 20px),-o-linear-gradient(top, #C8BCB6, #B3A39A);
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0,.05) 10px, rgba(0, 0, 0,.05) 20px),linear-gradient(top, #C8BCB6, #B3A39A);
+    }
+    @media screen and (-webkit-animation) {fieldset#inputs:before {width: 440px!important;}}
+    #inputs input { /* pictos des inputs */
+    background: #f1f1f1 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABkCAYAAACPQLC2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAhtJREFUeNrsV1FuwjAMbRECBAIqxD+7ARyhOwE9QvfDd28wbrB+8wNHaG9QblBuAP9IzeADAYLOntwqZQlk6z6mKZEMkRO/2o7T+plpmhplRsUoOTSABtAA/wagij+z2ayg7Pf7XfgLQGxSRSDOdrt95/dNJhOxB9frNQCxQQwSnAdSD24HvOZsgdpWzgG+J0ViWdZAFSASAESMsY0qgIMGWQ4I0FHOwW63w2w/t9vtwX6/3yjVQbPZ7IK8tVqtFCSBeW6Mc9ThGu6RheCDeBSvBfMptzZFHX2EPACZFwAajcYYYnW5c0dxQT9EkayN8xwAsisJMb4TPtqEGYDzg2vg5B6gW6UuU5kvdOVO5T2SiAfAyluAMAVDRns/c2DqBkMDaAANoAE0gAbQAH+PsdyyFQFz8amls0jNSOcjg6nKjHu93gDav5gzzEbWBjuwx5aGQI2UxTdYMBZoCPMYZATiCT0AZjIU0Z4kSV5o3SBS5slIly1q8TqdzpDWnayrl5EuS9L+xUBCGL8uA4junByfVCYDcBXLIPiSA2QjCEAxxg9a3mnBA2Ahc2QjHN21JU9em6bpHA6HTQ5Qr9fnnOuZ8ZrOHgtqlCXyeDyGBb5Qq9VExp+s5HQ6rWgeCu8CjFeB2wxc9M/n8+rhZeIqLn8yxgfGS6XbSAWx5t2+XC5L5fcBHckTHYsH4YTfeR9oxqIBNIAG+DWADwEGAAgZ5RSSVu1LAAAAAElFTkSuQmCC) no-repeat;
+    padding: 15px 15px 15px 30px;
+    margin: 0 0 10px 5px;
+    width: 85%;
+    border: 1px solid #ccc;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0 1px 1px #525252 inset, 0 1px 0 #6A6A6A;
+    -webkit-box-shadow: 0 1px 1px #525252 inset, 0 1px 0 #6A6A6A;
+    box-shadow: 0 1px 1px #525252 inset, 0 1px 0 #6A6A6A;
+    }
+   #password {
+    background-position: 5px -52px !important;
+    }
+    #inputs input:focus {
+    background-color: #fff;
+    border-color: #e8c291;
+    outline: none;
+    -moz-box-shadow: 0 0 0 1px #e8c291 inset;
+    -webkit-box-shadow: 0 0 0 1px #e8c291 inset;
+    box-shadow: 0 0 0 1px #e8c291 inset;
+    }
+    /*--------------------*/
+    #actions {
+    margin: 25px 0 0 0;
+    }
+
+
+{%  endblock %}
+
+{% block title %}Login / Logout{% endblock %}
+
+{% block first %}
+<div>
+
+Insert key form
+
+    <div style="text-align: center; float: none">
+    <form id="login" action="" >
+        <fieldset id="inputs">
+           <input id="password" type="text" onblur="if(this.value=='')this.value='Mot de passe';" onfocus="if(this.value=='Mot de passe')this.value='';" value="Mot de passe" />
+        </fieldset>
+        <fieldset id="actions">
+            <input type="submit" id="submit" value="connection"/>
+        </fieldset>
+    </form>
+</div>
+</div>
+
+{% endblock %}
+
+{% block second %}
+
+
+
+{% endblock %}
+
+{% block javascript %} {% endblock %}

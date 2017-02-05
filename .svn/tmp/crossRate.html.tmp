@@ -1,0 +1,167 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Cross Rating{% endblock %}
+
+{% block first %}
+
+    <!-- Modal -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Line Comment</h3>
+        </div>
+        <div class="modal-body">
+            You have selected the following line:
+            <div id="clicked_line" class="well well-small">
+
+            </div>
+
+
+            Insert a comment for the selected line:
+            <textarea id="lineArea" style="width:98%"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button id="btClose" class="btn"  data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="lineBt" class="btn btn-primary">Save changes</button>
+        </div>
+    </div>
+
+    <h3 class="title">CrossRating for request: <i>{{ aReq.title }}</i></h3>
+    <h4>{{ ansUser.username }}'s Code: </h4>
+
+    <div id="code_container" class="row-fluid">
+        <div id="codediv" class="span12"><textarea id="code"></textarea></div>
+        <pre class="hidden" style="display: none;">{{ userCode }}</pre>
+    </div>
+    <br>
+    <div class="row-fluid">
+        <div class="alert alert-info span3">
+            Want to make line comments <span id="lineCommentTooltip" data-trigger="hover" class="question" rel="popover">?</span>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block second %}
+    <div id="rating_container" class="reduce">
+    <form action="" method="post">
+    {% csrf_token %}
+    <p><b>{{ form.comment.label}}:</b> {{form.comment }}</p>
+    <p><b>{{ form.rate.label }}</b> {{ form.rate }} <b>/{{ MAX_RATING }}</b></p>
+    <p><b>{{ form.tagsList.label }}:</b> {{ form.tagsList }}</p>
+
+{% endblock %}
+
+{% block third %}
+    <div style="text-align: center">
+        <input id="in_submit" type="submit" class="btn btn-large btn-success" value="Add my comment">
+    </div>
+    </form>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        var mode="{{ lang.Name }}".toLowerCase();
+        var cLine=0;
+        var img = '<img src="{% get_static_prefix %}img/lineCommentTooltip.png" />';
+        $("#lineCommentTooltip").popover({ title: 'You can comment a line by clicking on it\'s number on the left', content: img, html:true });
+
+        $(document).ready(function(){
+            var code = $('pre').text();
+            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+            setMode(editor,mode);
+            editor.setValue(code);
+
+
+
+            editor.on("gutterClick", function(cm, n, gutter) {
+                // on line and gutter click
+                var info = cm.lineInfo(n);
+                if(info.gutterMarkers){
+                    //do nothing, marker already exists
+                } else {
+                    cm.setGutterMarker(n, "breakpoints", makeMarker());
+                    $('#clicked_line').html(info.text);
+                    $('#myModal').modal("show");
+                    cLine=n;
+                }
+            });
+
+            function makeMarker() {
+                var marker = document.createElement("div");
+                marker.style.color = "#1FDB18";
+                marker.innerHTML = "●";
+                return marker;
+            }
+
+
+
+            //Avoid newlines in text area
+            $("#lineArea").keypress(function(event) {
+                if(event.which == '13') {
+                    return false;
+                }
+            });
+
+            $('#btClose').click(function(){
+                //cancel button pressed, remove gutter
+                editor.setGutterMarker(cLine, "breakpoints", null);
+
+            });
+
+
+
+            $('#lineBt').click(function(){
+                //save in hidden fields the comments
+
+                var comment = $('#lineArea').val();
+
+                $('#in_submit').after( $("<input type='hidden' name='line_comment[line_n]' value="+cLine +">"));
+                $('#in_submit').after( $("<input type='hidden' name='line_comment[comment]' value='"+comment+"'>"));
+
+                $('#myModal').modal("hide");
+
+                //reset value for next comment
+                $('#lineArea').val("");
+
+            });
+
+
+        });
+
+        function setMode(cm, mode) {
+            if(mode !== undefined) {
+                mode = mode.toLowerCase();
+
+                var script = '{% get_static_prefix %}codemirror/mode/'+mode+'/'+mode+'.js';
+
+                $.getScript(script, function() {
+
+                    cm.setOption('mode', mode);
+
+                }).fail(function(){
+                            if(mode.localeCompare("java") == 0 || mode.localeCompare("csharp") ){
+                                mode = "text/x-"+mode;
+                            } else {
+                                mode =  "clike"
+                            }
+                            cm.setOption('mode', mode);
+                        });
+
+            }
+            else cm.setOption('mode', 'clike');
+        }
+    </script>
+
+
+
+{% endblock %}

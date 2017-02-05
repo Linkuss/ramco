@@ -1,0 +1,104 @@
+{% extends "index.html" %}
+{% load static %}
+{% block css %}
+
+{% endblock %}
+
+
+{% block title %}View request - {{ aRequest.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ aRequest.title }}</h2>
+
+
+    <h4>Requested by: {{ aRequest.user.username }}</h4>
+
+    <br>
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ aRequest.description }}
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+    {% if aRequest.code %}
+        <h4>Code: </h4>
+
+        <textarea id="reqCode"> {{ aRequest.code }}</textarea>
+
+    {% else %}
+       <div class="text-info">
+        No code has been submitted.
+       </div>
+    {% endif %}
+
+     <h4>Language: </h4>{{ aRequest.language }}
+{% endblock %}
+
+{% block third %}
+	{% if noButton %}
+	    {% if aRequest.state < '2' %}
+	        {% ifnotequal aRequest.user  aUser %}
+	    		<form action="" method="post">
+	    		{% csrf_token %}
+	
+	    		<p><label><b>Your version of the code:</b></label> {{  form.code }}</p>
+	
+	        	<div class="title">
+	       			<br>
+	        		<br>
+	        		<input class="btn btn-large btn-success reduce" type="submit" id="submit"  value="Add my code">
+	        	</div>
+	    </form>
+	         {% else %}
+	         <div class="alert">
+	         	<strong>Warning!</strong> You can't answer your own request
+	         </div>
+	    	{% endifnotequal %}
+	     {% else %}
+	        <div class="alert">
+	            <strong>Warning!</strong> This request is closed or on cross rating, no comments are allowed
+	        </div>
+	    {% endif %}
+	{% else %}
+		<div class="alert">
+	        <strong>Warning!</strong> You already responded to this request or not allowed to respond !
+	    </div>
+	{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+
+            var editor = CodeMirror.fromTextArea(document.getElementById("reqCode"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                gutters: ["CodeMirror-linenumbers", "breakpoints"],
+                mode: "text/x-java"
+            });
+
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-java"
+            });
+
+
+
+       });
+
+    </script>
+
+
+{% endblock %}

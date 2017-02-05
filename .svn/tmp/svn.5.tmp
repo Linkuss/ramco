@@ -1,0 +1,35 @@
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+
+
+SUB_CHOICES_LANG = (
+    ('Java', 'Java'),
+    ('C++', 'C++'),
+)
+
+SUB_CHOICES_TYPE = (
+    ('Req', 'Request'),
+    ('Rat', 'Rate'),
+)
+
+
+
+def register(request):
+        if request.method == 'POST':
+            form = UserCreationForm(request.POST)
+            if form.is_valid():
+                new_user = form.save()
+                return HttpResponseRedirect("/index/")
+        else:
+            form = UserCreationForm()
+        return render_to_response("signup.html", {'form': form,})
+    
+class SubmitForm(forms.Form):
+    title = forms.CharField()
+    description = forms.CharField(widget=forms.Textarea)
+    language = forms.ChoiceField(SUB_CHOICES_LANG)
+    code = forms.CharField(widget=forms.Textarea)
+    type = forms.ChoiceField(widget=forms.RadioSelect, choices=SUB_CHOICES_TYPE)
+    

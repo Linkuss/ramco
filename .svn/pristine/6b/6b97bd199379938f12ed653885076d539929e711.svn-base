@@ -1,0 +1,86 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+
+	<h4>{{ user }}'s Code: </h4>
+
+    <div id="code_container" class="row-fluid">
+       <div id="codediv" class="span12"><textarea id="code"></textarea></div>
+       <pre class="hidden" style="display: none;">{{ userCode }}</pre>
+    </div>
+{% endblock %}
+
+
+{% block second %}
+	<div id="rating_container">
+   		<form action="" method="post">
+        	{% csrf_token %}
+       		{{ form.as_p }}
+        	<input type="submit" class="btn btn-large btn-success" value="Send my comment">
+    	</form>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        var mode="{{ lang }}".toLowerCase();
+
+        $(document).ready(function(){
+           	var code = $('pre').text();
+			var editor2 = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+            setMode(editor2,mode);
+            editor2.setValue(code);
+            
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true
+            });
+
+            var bt = document.getElementById("submit");
+
+            var area = document.getElementById("id_code");
+
+            $(bt).click(function(){
+                myCodeMirror.save();
+                area.value = myCodeMirror.getValue();
+            });
+
+
+
+
+        });
+
+        function setMode(cm, mode) {
+            if(mode !== undefined) {
+                mode = mode.toLowerCase();
+
+
+                var script = '{% get_static_prefix %}codemirror/mode/'+mode+'/'+mode+'.js';
+
+                $.getScript(script, function() {
+
+                    cm.setOption('mode', mode);
+
+                }).fail(function(){
+                            console.log("script failed, fallback to clike");
+                            cm.setOption('mode', 'clike');
+                        });
+
+            }
+            else cm.setOption('mode', 'clike');
+        }
+    </script>
+
+
+
+{% endblock %}

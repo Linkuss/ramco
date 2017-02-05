@@ -1,0 +1,46 @@
+__author__ = 'vince'
+from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+
+class Profile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    confirmation_code = models.CharField(max_length=50)
+    
+    
+class Language(models.Model):
+    Name = models.CharField(max_length=15)
+    
+class Tags(models.Model):
+    Name = models.CharField(max_length=15)
+    def __unicode__(self):
+        return self.Name
+
+
+class Submission(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+    language = models.ForeignKey(Language)
+    code = models.CharField(max_length=5000) #a changer, maybe more
+    date = models.DateField(auto_now=True)
+    user = models.ForeignKey(User)
+    meanRating = models.DecimalField(default=0, decimal_places=2, max_digits=4)
+    nbrComments = models.IntegerField(default=0)
+    
+class TaggedReview(models.Model):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    def __unicode__(self):
+        return self.tag
+
+class Review(models.Model):
+    rating = models.DecimalField(decimal_places=1, max_digits=3)
+    date = models.DateField(auto_now=True)
+    comment = models.CharField(max_length=1000)
+    code = models.CharField(max_length=5000, blank=True, null=True) #a changer, maybe more
+    user = models.ForeignKey(User)
+    submission = models.ForeignKey(Submission)
+    tagsList = generic.GenericRelation(TaggedReview)

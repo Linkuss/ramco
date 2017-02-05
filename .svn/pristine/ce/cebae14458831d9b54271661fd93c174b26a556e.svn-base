@@ -1,0 +1,297 @@
+{% extends "index.html" %}
+{% load static %}
+{% block css %}
+
+.table th, .table td {
+border-top: none;
+}
+.hligh {background: #B3C6E6;
+    color: #000000;}
+
+
+
+{% endblock %}
+
+
+{% block title %}View sumbission {{ sub.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ sub.title }} ({{ sub.meanRating }}/{{ MAX_RATING }})</h2>
+
+
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ sub.description }}
+    </div>
+    <br>
+    <div class="row-fluid">
+        <div id="code_text" class="span6"><h4>Code:</h4></div>
+
+    </div>
+
+    <div id="code_container" class="row-fluid">
+        <div id="code1" class="span12"><textarea id="code"></textarea></div>
+
+
+
+       <pre class="hidden" style="display: none;">{{ sub.code }}</pre>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block second %}
+    <h3>Comments:</h3>
+    {% for comment in comments  %}
+
+        <div class="well well-small">
+            <table class="table">
+                <tbody>
+                <!-- Results table headers -->
+                <tr>
+                    <td id="c_id_{{comment.id}}"><h4>{{comment.user.username}}, the {{ comment.date }} commented:</h4></td>
+                    <td style="text-align: center"><h4>Rating:</h4></td>
+                </tr>
+                <tr>
+                    <td style="width:93%">{{ comment.comment }}</td>
+                    <td style="width:7%; text-align: center"><div id="rating" class="rating"><h2>{{ comment.rating }}</h2></div></td>
+                </tr>
+                {% if comment.tagsList.all %}
+                <tr>
+                	<td><h4>Tags : {% for t in comment.tagsList.all %}<span class="label">{{ t.tag }}</span> {% endfor %}</h4></td>
+                	<td style="text-align: center">{% if comment.code %}<button id="{{ comment.id }}" class="btn btn-info" type="button">Compare code</button>{% endif %}</td>
+                    <td id="c_code_{{ comment.id }}" class="hidden" style="display: none;">{{ comment.code }}</td>
+                </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    {% endfor %}
+{% endblock %}
+
+{% block third %}
+    <div class="title">
+        <a class="btn btn-large btn-success" href="rating">Add a comment</a>
+    </div>
+
+    <script type="text/javascript" src="{% get_static_prefix %}difflib.js"></script>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+
+        var mode = "{{ sub.language.Name }}".toLowerCase();
+
+        console.log(mode);
+
+        var isAlreadyClicked = false;
+
+        $(document).ready(function(){
+
+
+            var code = $('pre').text();
+
+            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+
+
+            setMode(editor,mode);
+
+            editor.setValue(code);
+
+            {% for lineComment in line_comments %}
+                var line_num={{ lineComment.line_n }};
+                var info = editor.lineInfo(line_num);
+                editor.setGutterMarker({{ lineComment.line_n }}, "breakpoints", info.gutterMarkers ? null : makeMarker('{{ lineComment.line_n }}','{{ lineComment.line_comment }}'));
+
+            {% endfor %}
+
+
+            editor.on("gutterClick", function(cm, n, gutter) {
+                if(gutter.localeCompare("CodeMirror-linenumbers") == 0){
+                    var nr = n+1;
+                    console.log("Line n°"+nr +" clicked");
+                } else {
+                    var info = cm.lineInfo(n);
+                    cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : makeMarker(n,""));
+                }
+            });
+
+            function makeMarker(line_n, comment) {
+                var marker = document.createElement("div");
+                marker.setAttribute("id","marker_"+line_n);
+                marker.style.color = "#822";
+                marker.innerHTML = "<a href='#' data-toggle='tooltip' data-placement='top' data-animation='true' title='"+comment+"'>●</a>";
+                return marker;
+            }
+
+            //Display sencond code on button click
+            $("button").click(function () {
+
+
+                var bt_id= $(this).attr("id");
+
+                //Multiple click on button does nothing!
+                if(isAlreadyClicked){
+                    isAlreadyClicked= false;
+                    $('#code2').remove();
+                    $('#code_close').remove();
+                    $('#code_text2').remove();
+                    $('#close_button').remove();
+
+
+                }
+
+                isAlreadyClicked = true;
+
+                $('#code1').after( $("<div class='span6' id='code2'><textarea id='cm_code_2'></textarea></div>"));
+
+                var username_c = $('#c_id_'+bt_id).children().first().text().split(",")[0];
+
+                var close_bt = $('<button/>',
+                        {
+                            class: 'close',
+                            id:'code_close',
+                            click: function () {
+
+                                $("#code2").remove();
+                                $('#code_text2').remove();
+                                $('#code_close').remove();
+                                $('#close_button').remove();
+
+                                $("#code1").removeClass("span6");
+
+                                $("#code1").addClass("span12");
+
+                                editor.setValue(code);
+
+                            }
+                        });
+
+
+
+               // $("#code_close").add("i").addClass("icon-remove");
+
+                $('#code_text').after($("<div id='code_text2' class='span5'><h4>"+username_c+" code:</h4></div>"));
+
+                $('#code_text2').after( $("<div id='close_button' class='span1'></div>"));
+
+                $('#close_button').append(close_bt);
+
+                $('#code_close').html("<i class='icon-remove'></i>");
+
+                $("#code1").removeClass("span12");
+
+                $("#code1").addClass("span6");
+
+
+
+
+                var editor2 = CodeMirror.fromTextArea(document.getElementById("cm_code_2"), {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    readOnly: true,
+                    mode: 'python',
+                    gutters: ["CodeMirror-linenumbers", "breakpoints"]
+                });
+
+                var code2 = $('#c_code_'+bt_id).text();
+                setMode(editor2,mode);
+                
+
+
+                editor2.setValue(code2);
+
+
+                var base = difflib.stringAsLines(code);
+                var newtxt = difflib.stringAsLines(code2);
+
+                // create a SequenceMatcher instance that diffs the two sets of lines
+                var sm = new difflib.SequenceMatcher(base, newtxt);
+
+                // get the opcodes from the SequenceMatcher instance
+                // opcodes is a list of 3-tuples describing what changes should be made to the base text
+                // in order to yield the new text
+                var opcodes = sm.get_opcodes();
+                for(i=0; i<opcodes.length;i++){
+                    //console.log(opcodes[i]);
+                    if(opcodes[i][0].localeCompare("replace") == 0){
+                        var start = opcodes[i][1];
+                        var end = opcodes[i][2];
+
+                        for(j=start;j<end;j++){
+                            editor2.addLineClass(j,"background","hligh");
+
+
+                        }
+
+
+                    }
+                }
+
+
+
+                editor.setValue(code);
+
+                $(document.body).animate({
+                   'scrollTop':   $('#description').offset().top
+                }, 500);
+
+
+            });
+
+
+            $("buttoln").click(function () {
+                console.log("LOL");
+
+            });
+
+
+
+
+        });
+
+
+        function setMode(cm, mode) {
+            if(mode !== undefined) {
+                mode = mode.toLowerCase();
+
+            var script = '{% get_static_prefix %}codemirror/mode/'+mode+'/'+mode+'.js';
+
+                $.getScript(script, function() {
+
+                    cm.setOption('mode', mode);
+
+                }).fail(function(){
+
+                            if(mode.localeCompare("java") == 0 || mode.localeCompare("csharp") ){
+                                mode = "text/x-"+mode;
+                            } else {
+                                mode =  "clike"
+                            }
+                            console.log(mode);
+                            console.log("script failed, fallback to clike");
+                            cm.setOption('mode', mode);
+                        });
+            }
+            else cm.setOption('mode', 'clike');
+        }
+
+
+    </script>
+
+
+{% endblock %}

@@ -1,0 +1,26 @@
+from django.conf.urls import patterns, include, url
+
+from . import views
+from . import forms
+
+# Uncomment the next two lines to enable the admin:
+from django.contrib import admin
+admin.autodiscover()
+
+urlpatterns = patterns('',
+    url(r'^$', views.index, name='index'),
+    url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}, name='login'),
+    url(r'^signup/$', views.register, name='register'),
+    url(r'^submit/$', views.submit, name='submit'),
+    url(r'^confirm/(?P<confirmation_code>[^/]+)/(?P<username>[^/]+)/$', views.confirm),
+
+    # Examples:
+    # url(r'^$', 'ramco.views.home', name='home'),
+    # url(r'^ramco/', include('ramco.foo.urls')),
+
+    # Uncomment the admin/doc line below to enable admin documentation:
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:
+    url(r'^admin/', include(admin.site.urls)),
+)

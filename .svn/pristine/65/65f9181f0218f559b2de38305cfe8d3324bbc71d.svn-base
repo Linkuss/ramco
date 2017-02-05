@@ -1,0 +1,137 @@
+/*RAMCO css, stylesheet
+ Vincenzo Do, Tiago De Deus
+*/
+
+
+html, body {
+    height: 100%;
+}
+
+#tasks {
+    padding: 20px;
+}
+
+
+#tasks .item {
+    padding: 15px 20px 15px 0;
+    position: relative;
+    font-size: 24px;
+    border-bottom: 1px solid #cccccc;
+}
+
+#tasks .item.done span {
+    color: #777777;
+    text-decoration: line-through;
+}
+
+
+
+
+/* footer code from https://gist.github.com/martinbean/1855032 */
+footer {
+    color: #666;
+    background: #222;
+    padding: 17px 0 18px 0;
+    border-top: 1px solid #000;
+
+}
+
+footer a {
+    color: #999;
+}
+
+
+footer a:hover {
+    color: #efefef;
+}
+
+
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -63px;
+}
+
+.push {
+    height: 63px;
+}
+
+
+/* Custom container */
+.container {
+    margin: 0 auto;
+    max-width: 1280px;
+}
+.container > hr {
+    margin: 60px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+    margin: 80px 0;
+    text-align: center;
+}
+.jumbotron h1 {
+    font-size: 60px;
+    line-height: 1;
+}
+.jumbotron .lead {
+    font-size: 24px;
+    line-height: 1.25;
+}
+.jumbotron .btn {
+    font-size: 21px;
+    padding: 14px 24px;
+}
+/* Customize the navbar links to be fill the entire space of the .navbar */
+.navbar .navbar-inner {
+    padding: 0;
+}
+.navbar .nav {
+    margin: 0;
+    display: table;
+    width: 100%;
+}
+.navbar .nav li {
+    display: table-cell;
+    width: 1%;
+    float: none;
+}
+.navbar .nav li a {
+    font-weight: bold;
+    text-align: center;
+    border-left: 1px solid rgba(255,255,255,.75);
+    border-right: 1px solid rgba(0,0,0,.1);
+}
+.navbar .nav li:first-child a {
+    border-left: 0;
+    border-radius: 3px 0 0 3px;
+}
+.navbar .nav li:last-child a {
+    border-right: 0;
+    border-radius: 0 3px 3px 0;
+}
+.errorlist {
+    color: red;
+}
+.helptext {
+    color: blue;
+}
+.pointer {
+    cursor: pointer; cursor: hand;
+}
+
+.title {
+    margin: 20px 0;
+    text-align: center;
+}
+.breakpoints {
+    width: .8em;
+}
+.breakpoint {
+    color: #822;
+}
+.CodeMirror {
+    border: 1px solid #aaa;
+}

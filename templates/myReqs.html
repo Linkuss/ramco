@@ -1,0 +1,80 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}My Reviews / Requests{% endblock %}
+
+{% block first %}
+	<ul class="nav nav-tabs">
+    	<li><a href="{% url 'my Reviews' %}">My codes{% if notiRev %} (new){% endif %}</a></li>
+    	<li class="active"><a href="{% url 'my Requests' %}">My Requests</a></li>
+    	<li><a href="{% url 'myCrossRating' %}">Cross-Rating{% if notiCR %} (new){% endif %}</a></li>
+    </ul>
+    <div id="table_container">
+    {% if requests %}
+ 	<table class="table table-striped table-hover table-bordered">
+		<thead>
+	    	<tr class="info">
+	        	<th>Language</th>
+	            <th>Title</th>
+	            <th>Number of replies</th>
+                <th>Status</th>
+	            <th>Key</th>
+	        </tr>
+	    </thead>
+	    	<tbody>
+	        {% for req in requests  %}
+	        	<tr class="pointer">
+	            		<td class="r_id" style="display: none;">{{ req.id }}</td>
+	                	<td>{{ req.language.Name }}</td>
+	                    <td>{{ req.title }}</td>
+	                    <td>{{ req.nbrOfReplies }}{%if req.nbrOfRequiredSubs %}/{{ req.nbrOfRequiredSubs }}{% endif %} {% if req.ownerNotif %}<span class="label label-info"> <b>new responses(s) !</b></span>{% endif %}</td>
+                        <td class="stat_id">{{ req.get_state_display }}</td>
+	                    <td>{% if req.key %}<i class="icon-lock"></i> {{ req.key }}{% else %}No key{% endif %}</td>
+                </tr>
+	         {% endfor %}
+	        </tbody>
+     </table>
+     {% else %}
+     	<div class="alert alert-info"><h4>No Requests yet !</h4></div>
+	 {% endif %}
+	</div>
+{% endblock %}
+
+
+{% block second %}
+ {% if not requests %}
+
+    <div class="alert alert-block">
+        <strong>Click <a href="{% url 'submit request' %}">here</a> to create your first request</strong>
+    </div>
+
+    {% endif %}
+	
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            $('tr').click(function() {
+
+
+                var $cell=$(this).closest('tr');
+
+                var id = $(this).closest('tr').children('td.r_id').text();
+                var status = $(this).closest('tr').children('td.stat_id').text();
+                console.log(status);
+                if( !$cell.hasClass('info')){
+                    if(status.localeCompare("CrossRating") == 0){
+                        window.location.href = "../requestManageCR/"+id;
+                    } else {
+                        window.location.href = "../requestManage/"+id;
+                    }
+
+                }
+            });
+
+        });
+    </script>
+ {% endblock %}

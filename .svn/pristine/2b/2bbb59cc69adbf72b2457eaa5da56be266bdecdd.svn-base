@@ -1,0 +1,18 @@
+{% extends "index.html" %}
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+   <form action="" method="post">
+        {% csrf_token %}
+       {{ form.as_p }}
+        <input type="submit" class="btn btn-large btn-success" value="Send my comment">
+    </form>
+{% endblock %}
+
+
+{% block second %}
+
+{% endblock %}
+
+{% block javascript %} {% endblock %}

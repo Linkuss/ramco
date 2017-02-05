@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}RAMCO - RateMyCode!{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}RHome page{% endblock %}">
+    <meta name="author" content="Vincenzo Do, Tiago De Deus">
+
+    <!-- Le styles -->
+    <link href="{% get_static_prefix %}css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% get_static_prefix %}codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="{% get_static_prefix %}ramco.css">
+    <link href="{% get_static_prefix %}css/bootstrap-responsive.css" rel="stylesheet">
+
+    <style type="text/css">
+        {% block css %}
+        {% endblock %}
+    </style>
+
+</head>
+
+<body>
+<div class="wrapper">
+	<div class="container">
+	    {% block navbar %}
+	        <div class="masthead">
+	            <h3 class="muted">RAMCO - Rate My Code !</h3>
+	            <div class="navbar">
+	                <div class="navbar-inner">
+	                    <div class="container">
+	                        <ul class="nav">
+	                            <li {% if navhome %}class="active"{% endif %}><a href="{% url 'index' %}">Home</a></li>
+                                <li {% if navreviews %}class="active"{% endif %}><a href="#">Reviews</a></li>
+	                            <li {% if navrevreq %}class="active"{% endif %}><a {% if nbrNot %}data-placement="bottom" data-toggle="tooltip" title="{{ nbrNot }} news"{% endif %} href="{% url 'my Reviews' %}">MyReviews / MyRequests{% if nbrNot %} ({{ nbrNot }}){% endif %}</a></li>
+	                            <li {% if navprof %}class="active"{% endif %}><a href="#">Profile</a></li>
+	                            <li {% if navhelp %}class="active"{% endif %}><a href="#">Help</a></li>
+	                            {% if user.is_authenticated %}
+	                                <li {% if navlog %}class="active"{% endif %}><a href="{% url 'logout' %}">Logout</a></li>
+	                            {% else %}
+	                                <li {% if navlog %}class="active"{% endif %}><a href="{% url 'login' %}">Login</a></li>
+	                            {% endif %}
+	                        </ul>
+	                    </div>
+	                </div>
+	            </div><!-- /.navbar -->
+	        </div>
+	    {% endblock %}
+	
+	    {% block first %}
+	    
+	        <!-- Jumbotron -->
+	        <div class="jumbotron">
+	            {% if user.is_authenticated %}
+	                <h1>Welcome {{ user.username }}, Thanks for logging in.</h1>
+	            {% else %}
+	                <h1>Welcome to RAMCO - Rate My Code</h1>
+	            {% endif %}
+	            <p class="lead">This site is here to help you getting relevant feedback from others. As any programmer knows, peer rating is a really usefull method to check the quality of your code, and here you can do just that. Rate the code of others, submit your code for rating or even submit a request. Start using RAMCO and you'll never want to use another peer rating method ever again.</p>
+	            {% if user.is_authenticated %}
+	            	<a class="btn btn-large btn-success" href="submit">Rate My Code</a>
+	            {% else %}
+	            	<a class="btn btn-large btn-success" href="signup">Getting Started</a>
+	            {% endif %}
+	        </div>
+	    {% endblock %}
+	        <hr>
+	    {% block second %}
+	        <h1>Latest submissions</h1><br>
+	        <table class="table table-striped table-hover table-bordered">
+	            <thead>
+	            <tr class="info">
+	                <th>Language</th>
+	                <th>Title</th>
+	                <th>Rating</th>
+	                <th>User</th>
+	                <th>Submitted</th>
+	                <th>Nb. of comments</th>
+	            </tr>
+	            </thead>
+	            <tbody>
+	            {% for sub in sub_list  %}
+	                <tr class="pointer">
+	                    <td class="s_id" style="display: none;">{{ sub.id }}</td>
+	                    <td>{{ sub.language.Name }}</td>
+	                    <td>{{ sub.title }}</td>
+	                    <td>{{ sub.meanRating|floatformat:"-2" }}</td>
+	                    <td>{{ sub.user }}</td>
+	                    <td>{{ sub.date }}</td>
+                        <td>{{ sub.nbrComments }}</td>
+	               </tr>
+	            {% endfor %}
+	            </tbody>
+	        </table>
+	
+	        <ul class="pager">
+	            <li class="previous">
+	                <a href="#">&larr; Older</a>
+	            </li>
+	            <li class="next">
+	                <a href="#">Newer &rarr;</a>
+	            </li>
+	        </ul>
+	    {% endblock %}
+	    <hr>
+
+        {% block third %}
+
+        {% endblock %}
+
+
+	</div> <!-- /container -->
+	<div class="push"><!--//--></div>
+</div>
+
+
+{% block footer %}
+    <footer>
+        <div class="container">
+            <p class="muted credit">&copy; ramco 2013 v0.2.3 <u><a href={% url 'changelog' %}>changelog</a></u> / Authors : Tiago De Deus - Vincenzo Do |
+                <u><a href={% url 'todo' %}>Todo</a></u></p>
+        </div>
+    </footer>
+{% endblock %}
+
+
+    <script src="{% get_static_prefix %}codemirror/lib/codemirror.js"></script>
+    <script src="{% get_static_prefix %}codemirror/mode/clike/clike.js"></script>
+    <script src="{% get_static_prefix %}jquery.js"></script>
+    <script src="{% get_static_prefix %}js/bootstrap.js"></script>
+
+    {% block javascript %}
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            $('tr').click(function() {
+
+
+                var $cell=$(this).closest('tr');
+
+                var id = $(this).closest('tr').children('td.s_id').text();
+                if( !$cell.hasClass('info')){
+                    window.location.href = "submission/"+id;
+                }
+            });
+
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

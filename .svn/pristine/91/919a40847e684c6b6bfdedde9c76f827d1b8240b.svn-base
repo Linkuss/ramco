@@ -1,0 +1,105 @@
+{% extends "index.html" %}
+{% load static %}
+{% block css %}
+
+{% endblock %}
+
+
+{% block title %}View request - {{ aRequest.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ aRequest.title }}</h2>
+
+
+    <h4>Requested by: {{ aRequest.user.username }}</h4>
+
+    <br>
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ aRequest.description }}
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+    {% if aRequest.code %}
+        <h4>Code: </h4>
+        <div id="code" class="well well-small">
+            {{ aRequest.code }}
+
+        </div>
+    {% else %}
+       <div class="text-info">
+        No code has been submitted.
+       </div>
+    {% endif %}
+
+     <h4>Language: </h4>{{ aRequest.language }}
+{% endblock %}
+
+{% block third %}
+    {% if aRequest.state < '2' %}
+    <form action="" method="post">
+    {% csrf_token %}
+
+    <p><label><b>Your version of the code:</b></label> {{  form.code }}</p>
+
+        <div class="title">
+        <br>
+        <br>
+        <input class="btn btn-large btn-success reduce" type="submit" id="submit"  value="Send my code">
+        </div>
+    </form>
+
+     {% else %}
+    <h4>This request is closed or on cross rating, no comments are allowed</h4>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-java"
+            });
+
+            var bt = document.getElementById("submit");
+
+            var area = document.getElementById("id_code");
+
+            $('#startCR').click(function(){
+
+                $('#myModal').modal("show");
+
+            });
+
+            $('#saveBT').click(function(){
+
+                //TODO start cross rating
+
+            });
+
+            $('#closeReq').click(function(){
+
+                //TODO close request
+
+            });
+
+
+
+        });
+
+    </script>
+
+
+{% endblock %}

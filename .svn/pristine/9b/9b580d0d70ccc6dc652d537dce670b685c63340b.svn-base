@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+{% load static %}
+{% block first %}
+
+    <div id="link">
+        <h4>Here is your link to access your request "{{ req.title }}": <a href={% url 'viewRequest' req.id %}> http://localhost:8000{% url 'viewRequest' req.id %} </a> </h4>
+
+
+    </div>
+
+{% endblock %}
+{% block second %}
+
+    <div class="title">
+        <a style="text-align: center" class=" btn btn-success" href="{%  url 'index'  %}">Go to HomePage</a>
+    </div>
+{% endblock %}
+{% block javascript %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "index.html" %}
+{% block css %}
+
+{% endblock %}
+
+
+{% block title %}My Profile{% endblock %}
+
+{% block first %}
+    <h2 class="title">Hello {{ user.username }} here you can modify your password</h2>
+
+
+{% endblock %}
+
+
+{% block second %}
+    {{ message }}
+
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Save">
+    </form>
+{% endblock %}
+
+{% block third %}
+
+{% endblock %}
+
+{% block javascript %}
+
+
+{% endblock %}

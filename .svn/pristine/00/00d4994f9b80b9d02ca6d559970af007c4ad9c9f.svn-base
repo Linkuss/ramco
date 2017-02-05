@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}My Reviews / Requests{% endblock %}
+
+{% block first %}
+<h4>Hello !</h4>
+	<ul class="nav nav-tabs">
+    	<li><a href="{% url 'my Reviews' %}">My codes</a></li>
+    	<li class="active"><a href="{% url 'my Requests' %}">My Requests</a></li>
+    	<li><a href="#">Cross-Rating</a></li>
+    </ul>
+    <div id="table_container">
+    {% if requests %}
+ 	<table class="table table-striped table-hover table-bordered">
+		<thead>
+	    	<tr class="info">
+	        	<th>Language</th>
+	            <th>Title</th>
+	            <th>Number of replies</th>
+	            <th>Key</th>
+	        </tr>
+	    </thead>
+	    	<tbody>
+	        {% for req in requests  %}
+	        	<tr class="pointer">
+	            		<td class="s_id" style="display: none;">{{ sub.id }}</td>
+	                	<td>{{ req.language.Name }}</td>
+	                    <td>{{ req.title }}</td>
+	                    <td>{{ req.nbrOfReplies }}{%if req.nbrOfRequiredSubs %}/{{ req.nbrOfRequiredSubs }}{% endif %}</td>
+	                    <td>{% if req.key %}<i class="icon-lock"></i> {{ req.key }}{% else %}No key{% endif %}</td>
+                </tr>
+	         {% endfor %}
+	        </tbody>
+     </table>
+     {% else %}
+     	<div class="alert alert-info"><h4>No Requests yet !</h4></div>
+	 {% endif %}
+	</div>
+{% endblock %}
+
+
+{% block second %}
+	
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            $('tr').click(function() {
+
+
+                /*var $cell=$(this).closest('tr');
+
+                var id = $(this).closest('tr').children('td.s_id').text();
+                if( !$cell.hasClass('info')){
+                    window.location.href = "../submission/"+id;
+                }*/
+            });
+
+        });
+    </script>
+ {% endblock %}

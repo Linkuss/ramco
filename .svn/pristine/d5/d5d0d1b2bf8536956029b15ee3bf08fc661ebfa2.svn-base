@@ -1,0 +1,212 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Help{% endblock %}
+{% block forHelpPage %}{% endblock %}
+{% block css %}
+{% endblock %}
+{% block tagBody %}<body class="body" data-spy="scroll" data-target=".bs-docs-sidebar">{% endblock %}
+{% block first %}
+	<div class="row-fluid">
+      <div class="span3 bs-docs-sidebar" >
+        <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="100">
+          <li><a href="#intro"><i class="icon-chevron-right"></i>Introduction</a></li>
+          <li><a href="#submit-code"><i class="icon-chevron-right"></i>Submit your code</a></li>
+          <li><a href="#rating-code"><i class="icon-chevron-right"></i>Code rating and comments</a></li>
+          <li><a href="#view-comments"><i class="icon-chevron-right"></i>View comments</a></li>
+          <li><a href="#request"><i class="icon-chevron-right"></i>Submit a request</a></li>
+          <li><a href="#answer-req"><i class="icon-chevron-right"></i>Answer a request</a></li>
+          <li><a href="#manage-req-bxr"><i class="icon-chevron-right"></i>Management of a request (open and closed)</a></li>
+          <li><a href="#cross-rating"><i class="icon-chevron-right"></i>Cross-Rating</a></li>
+          <li><a href="#manage-req-axr"><i class="icon-chevron-right"></i>Management of a request (cross-rating)</a></li>
+        </ul>
+      </div>
+      <div class="span9">
+    	 <section id="intro">
+    	 	<div class="page-header">
+            	<h1>Introduction</h1>
+          	</div>
+			<p>This site was done as a project for the spring semester of 2013 by Vincenzo Do and Tiago De Deus. The idea of it is to give to the school, and in the future to open communities, the opportunity to do code rating easily and efficiently. Another task given to us was to implement a way to use the rating system of the site to allow programming online courses to have a solution in correcting the exercises.  As you may know, these online courses can have thousands of students in one course and it's impossible for the teacher to correct them all. This is the reason why with our site you can do what we call cross-rating. A person does a request; people submit their code to the request. The person who has done the request can then activate the cross-rating and everyone who submitted a code will have several codes of other persons who also submitted to rate. In the next sections, we will explain how you can utilize these 2 features: the traditional code rating and the Request/Cross-Rating mechanism.</p>
+		 </section>
+		 <section id="submit-code">
+    	 	<div class="page-header">
+            	<h1>Submit your code</h1>
+          	</div>
+			<p>To submit your code you can click on the "Rate my Code" button on the main's page carousel.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image1.png"></div>
+			<br>
+			<p>Once you're in the submission page, make sure that you submit your code for rating and don't do a request. You can find out more information about the request function lower in this page.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image2.png"></p></div>
+			<br>
+			<p>On the submission page you have to fill out multiple fields. The <font color="red">Title</font> field is just that, the title for your code. Keep in mind that this is one of the fields that will be seen on home page and the Submission's page. You should try to make your title clear and informative to incite other users to come and rate your code. Next is the <font color="blue">Description</font> field. Try to provide as much information as possible about your code here. People who rate your code will have an easier time giving useful critics if they now the context surrounding your code.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image3.png"></div>
+			<br>
+			<p>You now have to select the language in which your code is written, it not only helps other users situate your code but it will also change the syntax highlighting of the code so please choose the good language.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image4.png"></div>
+			<br>
+			<p>Finally you have to fill the most important field, the <font color="orange">Code</font> field. This is where you put the code you want other users to rate. Please remember that code rating is supposed to be a tool to improve your code and your coding skills but is not made to finish a method. You should be confident about your code when you submit it.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image5.png"></div>
+			<br>
+		 </section>
+		 <section id="rating-code">
+    	 	<div class="page-header">
+            	<h1>Code rating and comments</h1>
+          	</div>
+          	<p>Of course submitting your code for other users to rate is awesome, but rating someone else's code is also part of the fun.</p>
+          	<p>When you watch the code submitted by another user, you can see at the bottom of the page a button to add a comment. This will open the page to rate his code.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image6.png"></div>
+			<br>
+          	<p>At the top of the page, you will see the code of the user. In here you can click on the <font color="green">line number column</font> to put a comment on a specific line. A pop up will appear where you can put your comment. </p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image7.png"></div>
+			<br>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image8.png"></div>
+			<br>
+          	<p>Please keep it short as it is just a quick comment on a line, for a more detailed comment use the next field. In here you can do your general review of the code and give advices to improve the code.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image9.png"></div>
+			<br>
+          	<p>The next field is optional; here you can put how you would have code the code of the user. You can use this field to demonstrate something you have explained in the previous field for example or just to demonstrate an alternative way to code the same method/class.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image10.png"></div>
+			<br>
+          	<p>Finally you need to give a <font color="red">score</font> to the code you're reviewing and, to help categorize your review, you can check whatever <font color="blue">categories</font> your review fits in. You can choose to give no category to your review by simply leave every choice unchecked.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image11.png"></div>
+			<br>
+		 </section>
+		 <section id="view-comments">
+    	 	<div class="page-header">
+            	<h1>View commments</h1>
+          	</div>
+          	<p>Once your code has received comments, you will see them easily on your submission's page. First you will see the blue dots next to some line numbers. These are the line comments. If you put your mouse cursor on them, a tooltip will appear with the name of the user who commented and the comment.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image12.png"></div>
+			<br>
+          	<p>Bellow your code you will see the reviews. You can see there the <font color="green">review</font> of the person, the <font color="orange">score </font> this person has given to the code and optionally you can also see the <font color="red">tags</font> corresponding to the categories this user thinks it's review best fits in and a button "compare code" if the user as given his version of the code.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image13.png"></div>
+			<br>
+          	<p>If you click on this button, next to the original code will appear the reviewer's code. The differences between the two codes will be highlighted in blue. To close the other user's code, you can click on the <font color="red">close button</font>.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image14.png">  </div>
+			<br>        	
+		 </section>
+		 <section id="request">
+    	 	<div class="page-header">
+            	<h1>Submit a request</h1>
+          	</div>
+          	<p>Before telling your how to do a request, lets talk a little bit about it. A request is basically what it says : a request for codes. You make a request and other people “give you” their code. This is useful if you don't know how you can code something or if you just want to see other variants of something you coded.</p>
+          	<p>A request has three steps. In the first step the request is “open”. During this step other users can submit their code to your request. Not anyone can necessarily respond to your request if you want to, but we'll see this later on this chapter. </p>
+
+		<p>Once certain requirements are met, your request will pass in the second step and will be “closed”. Once again, what theses requirements are will be explained a little further, but keep in mind that you can choose to close your request whenever you like. You can't however open it again. If your request is closed, it just means that nobody can submit a code to your request. <br>
+		On the management page of your request you can choose to go to step 3 and lunch the cross-rating. What the cross-rating is exactly will be explained in the next chapter. So let's go back to submitting a request !</p>
+		
+		<p>To submit a request you can click on the "Submit a request" button on the main's page carousel.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image28.png"></div>
+		<br>
+		<p>One you're on the submission page, you will see that you are now doing a request.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image27.png"></div>
+		<br>
+		<p>At the top of the form, you will see that you can choose your closing type. If you remember correctly, theses are the “requirement” talked about some paragraphs ago to make your request pass on the closed status. You have three types of closing that you can choose. If you choose <font color=”blue”>Number of responses</font>, once the number of people who responded to your request is the same as the number you choose, your request will automatically become closed.
+		If you <font color=”green”>choose an end date</font>, your request will automatically become closed when we're at the date you chosen.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image15.png"></div>
+		<br>
+		<p>Finally you saw that you can choose a list of users. If you select this option, a pop-up will appear where you can choose what users need to respond to your request.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image19.png"></div>
+		<br>
+		<p>If you choose this option, your request will be automatically closed when everyone you selected has responded to your request. Additionally, at the bottom of the page you a list of the selected users will be showed with the option to send them an email to your submission.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image20.png"></div>
+		<br>
+		<p>After choosing the closing type of your submission, you can put a key to your request. If you put a key, your request will not appear on the requests list and users how want to respond to your request will need the key to do it.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image16.png"></div>
+		<br>
+		
+		
+		<p>Next on the form you need to complete the standard fields like in the code submission : <font color="orange">Title</font>, <font color="green">Description</font> and the <font color="blue">Language</font> of the codes you expect.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image17.png"></div>
+		<br>
+		<p>Optionally you can then fill out the code field. This is useful if you are doing an exercise and you want to give a code with some TODOs</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image18.png"></div>
+		<br>
+		<p>Once you submitted you request, you will see a page with the link to respond to your request.</p>
+		
+		<div align="center"><img src="{% get_static_prefix %}img/helpPage/image29.png"></div>
+		<br>
+		<p>Please remember that : 
+		<ul>
+		<li>If you choose a list of users, you have the possibility to send an email with this link to the user you have chosen</li>
+		<li>If you put a key to your request, your submission will NOT appear on the submissions page. So you need to keep this link and give it to the users manually (if you have not chosen the list of users that is)</li>
+		<li>If you choose the list of users as closing type, you request will not appear on the submissions page either</li>
+		</ul></p>
+
+
+          	
+		 </section>
+		 <section id="answer-req">
+    	 	<div class="page-header">
+            	<h1>Answer a request</h1>
+          	</div>
+          	<p>To answer a request you first need to access the answer page. Like it was explained above, there are two types of requests : Open requests (no key) and private requests (with a key). There is also the requests who have a list of users who are kind of special but let's forget it for now. So first, open requests. To view them you can click on “Submissions” on the navigation bar. On the second section of the page, you will see the list of requests.</p>
+
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image30.png"></div>
+			<br>
+			
+			<p>If you click on a request, you will be brought to the page to respond directly.</p>
+			<p>Now if the request does have a key, it will not be on the list. The person who's done the request needs to give you the link to the request if you want to be able to answer to it. When trying to access the response page, you will be prompted to enter the key. Do it an press confirm</p>
+			
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image31.png"></div>
+			<br>
+			
+			<p>Now to explain the requests who have a list of users as closing method. Theses submissions will not be on the list, even if they don't have a key. If the user doing the request has not used the method of the website to send you the link by email, he will need to give you the link one way or the another. If he put a key on his request (which is kind of redundant as he already used the user list method) you will need to enter it to respond to the request.</p>
+			<br>
+			<p>Now that you are on the page to respond to the key, you just need to give your code and send it !</p>
+		 </section> 
+		 <section id="manage-req-bxr">
+    	 	<div class="page-header">
+            	<h1>Management of a request (open and closed)</h1>
+          	</div>
+          	<p>To go to the management page of one of your requests, first click on “My codes/requests” on the navigation bar. There you can click on the “My requests” tab. Please note that we have a notification system and that whenever there is something new you didn't see yet, it is marked at new on that page. Here the “(new)” indicates that someone responded to one of your requests.</p>
+
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image32.png"></div>
+			<br>
+			
+			<p>You can now see the list of your request and their state. You can also see the keys you put on your requests. If you click on a request you can see it's management page. Please note that the management page changes slightly if the request is in cross-rating state, you can have more informations about it in a next chapter.</p>
+			
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image33.png"></div>
+			<br>
+			
+			<p>On the management page, you can see all the users who answer your request or if you choose user list as closing method you will see the complete list of the users you chosen.</p>
+			<p>For each user you can see the code he submitted by clicking on the “View Code button”. If the user hasn't submitted his code yet (again, only possible with user list as closing method), a tooltip will appear to tell you that this user has not submitted his code yet.</p>
+			
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image22.png"></div>
+			<br>
+			
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image23.png"></div>
+			<br>
+			
+			<p>On the bottom of the page you have too buttons (or one). One to close the request manually, if the request isn't already closed, and another one to start the cross-rating. If you click on the second one a pop-up will appear asking you how many codes one person must rate. Once you chosen, click on Start cross-rating and let the fun begin !</p>
+
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image24.png"></div>
+			<br>
+			<p>On a side note, you can't start the cross-rating if you don't have at least 2 responses.</p>
+		 </section>
+		 <section id="cross-rating">
+    	 	<div class="page-header">
+            	<h1>Cross-Rating</h1>
+          	</div>
+          	text
+		 </section> 
+		 <section id="manage-req-axr">
+    	 	<div class="page-header">
+            	<h1>Management of a request (cross-rating)</h1>
+          	</div>
+          	text
+		 </section> 
+      </div>
+    </div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %}
+{% endblock %}

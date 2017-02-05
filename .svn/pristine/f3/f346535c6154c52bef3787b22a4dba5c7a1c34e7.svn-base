@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+{% load static %}
+{% block first %}
+<div class="row-fluid">
+	<div class="span8 offset2" id="tasks">
+		<div align="center"><h2>Todos</h2></div>
+		<br>
+		<div>
+            <div class="item">
+                Print selected users
+            </div>
+			<div class="item">
+				implement request and cross-rating...(1/2)
+			</div>
+			<div class="item">
+				implement profile...
+			</div>
+			<div class="item">
+				implement review page...
+			</div>
+			<div class="item">
+				Redirection page weird phrasing
+			</div>
+			<div class="item">
+				Style for the label of the radio buttons (almost)
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %} 
+{% endblock %}

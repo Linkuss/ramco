@@ -1,0 +1,52 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Help{% endblock %}
+{% block tagBody %}<body data-spy="scroll" data-target=".bs-docs-sidebar">{% endblock %}
+{% block first %}
+	<div class="row-fluid">
+      <div class="span3 bs-docs-sidebar" >
+        <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="100">
+          <li><a href="#intro"><i class="icon-chevron-right"></i>Introduction</a></li>
+          <li><a href="#submit-code"><i class="icon-chevron-right"></i>Submit your code</a></li>
+          <li><a href="#rating-code"><i class="icon-chevron-right"></i>Code rating and comments</a></li>
+          <li><a href="#request"><i class="icon-chevron-right"></i>Submit a request</a></li>
+          <li><a href="#cross-rating"><i class="icon-chevron-right"></i>Cross-Rating</a></li>
+        </ul>
+      </div>
+      <div class="span9">
+    	 <section id="intro">
+    	 	<div class="page-header">
+            	<h1>Introduction</h1>
+          	</div>
+			text
+		 </section>
+		 <section id="submit-code">
+    	 	<div class="page-header">
+            	<h1>Submit your code</h1>
+          	</div>
+			text
+		 </section>
+		 <section id="rating-code">
+    	 	<div class="page-header">
+            	<h1>Code rating and comments</h1>
+          	</div>
+          	text
+		 </section>
+		 <section id="request">
+    	 	<div class="page-header">
+            	<h1>Submit a request</h1>
+          	</div>
+          	text
+		 </section>
+		 <section id="cross-rating">
+    	 	<div class="page-header">
+            	<h1>Cross-Rating</h1>
+          	</div>
+          	text
+		 </section> 
+      </div>
+    </div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %}{% endblock %}

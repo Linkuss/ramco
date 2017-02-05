@@ -1,0 +1,803 @@
+import random
+from django.http import HttpResponse
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+import json
+from decimal import *
+from forms import SubmitForm
+from forms import UserCreateForm
+from forms import RatingForm
+from forms import RequestForm
+from forms import RequestAnswerForm
+from forms import CrossRatingForm
+from forms import KeyForm
+from models import *
+from django.conf import settings
+from random import choice
+from guardian.shortcuts import assign_perm
+from decorators import permission_required
+
+
+
+__author__ = 'vince'
+__author__ = 'tiago'
+
+
+def index(request):
+    """
+        This is the index of the web-site.
+    :param request: default parameter, http request
+    :return:
+    """
+    sub_list= Submission.objects.order_by('id').reverse()[0:10]
+    noti = 0
+    if request.user.is_authenticated():
+        noti = request.user.get_profile().nbrNotifs
+    return render_to_response('index.html', {'sub_list': sub_list, 'navhome' : True, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def submitC(request):
+    """
+        This view handles the submission of a code to the rating.
+    :param request: default parameter, http request
+    :return:
+    """
+    noti = request.user.get_profile().nbrNotifs
+    if request.method == 'POST':
+        form = SubmitForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("submitCode.html", {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+        tit = str(form['title'].value())
+        desc = str(form['description'].value())
+        co = str(form['code'].value())
+        langF = form['language'].value()
+        lang = Language.objects.get(Name=langF)
+        username=request.user.username
+        user = User.objects.get(username=username)
+        sub = Submission(title=tit, code=co, description=desc, language=lang, user=user)
+        sub.save()
+        return render_to_response("thankyou.html", {'thing': "submission", 'redirect': "your submission", 's_id': sub.id, 'nbrNot' : noti},context_instance=RequestContext(request))
+    else:
+        form = SubmitForm()
+        return render_to_response('submitCode.html', {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def submitR(request):
+    """
+        With this view a request can be created.
+        Once the request is created a mail notification is sent to the selcted users.
+    :param request: default parameter, http request
+    :return:
+    """
+    noti = request.user.get_profile().nbrNotifs
+    if request.method == 'POST':
+        form = RequestForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("submitReq.html", {'form': form, 'nbrNot': noti}, context_instance=RequestContext(request))
+        tit = str(form['title'].value())
+        desc = str(form['description'].value())
+        co = str(form['code'].value())
+        langF = form['language'].value()
+        lang = Language.objects.get(Name=langF)
+        key = str(form['key'].value())
+        if key.__len__() == 0:
+            key = None
+        user = User.objects.get(id=request.user.id)
+        closureChoice = int(form['endingMethodRadio'].value())
+        if (closureChoice == 1):
+            nbrOfReqUsers = form['nbrOfRequiredSubs'].value()
+            req = Request(title=tit, description=desc, code=co, language=lang, user=user, nbrOfRequiredSubs=nbrOfReqUsers, key=key, closing_type='1')
+            req.save()
+        elif (closureChoice == 2):
+            endDa = str(form['endDate'].value())
+            dateList = endDa.split("/")
+            dateF = "{0}-{1}-{2}".format(dateList[2], dateList[1], dateList[0])
+            req = Request(title=tit, description=desc, code=co, language=lang, user=user, endDate=dateF, key=key, closing_type='2')
+            req.save()
+        elif (closureChoice == 3):
+            userList = form['userList'].value()
+            nbrOfReqUsers = len(userList)
+            req = Request(title=tit, description=desc, code=co, language=lang, user=user, key=key, nbrOfRequiredSubs=nbrOfReqUsers, closing_type='3')
+            req.save()
+            for rUser in userList:
+                #call send mail
+                if form['sendMail'].value() == '1':
+                    send_request_notification_mail(rUser, req)
+                req.userList.add(rUser)
+            req.save()
+        else:
+            return render_to_response("submitReq.html", {'form': form, 'nbrNot': noti}, context_instance=RequestContext(request))
+        if not req.key:
+            for user in User.objects.all():
+                assign_perm('view', user, req)
+        return HttpResponseRedirect("/viewLink/"+str(req.id))
+    form = RequestForm({'endingMethodRadio':'1', 'sendMail':'1'})
+    return render_to_response('submitReq.html', {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def rating(request, s_id):
+    """
+        This view handles the rating process for a submission
+        all the commenting tools are available (tags, rating, line comment and comment).
+        The linecomments are an array.
+    :param request: default parameter, http request
+    :param s_id: the id of the submission
+    :return: on success redirects to the submission view
+    """
+    noti = request.user.get_profile().nbrNotifs
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("rating.html", {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+        else:
+            try:
+                sub = Submission.objects.select_for_update().get(id=s_id)
+                lComments = request.POST.getlist('line_comment[comment]')
+                lines_n = request.POST.getlist('line_comment[line_n]')
+                review = form.save(commit=False)
+                review.user = request.user
+                review.submission = Submission.objects.get(id=s_id)
+                review.rating = form['rate'].value()
+                review.code = form['code'].value()
+                review.save()
+                form.save()
+                tags = form['tagsList'].value()
+                for t in tags:
+                    t1 = TaggedReview(content_object=review, tag=t)
+                    t1.save()
+                sub = Submission.objects.select_for_update().get(id=s_id)
+                oldR = sub.meanRating
+                oldNbrC = sub.nbrComments
+                newR = (oldR*oldNbrC + Decimal(review.rating)) / (oldNbrC+1)
+                sub.meanRating = Decimal(newR)
+                sub.nbrComments = oldNbrC+1
+                if not sub.ownerNotif:
+                    sub.ownerNotif = True
+                    ownUser = Profile.objects.select_for_update().get(user_id=sub.user_id)
+                    ownNbrNotif = ownUser.nbrNotifs
+                    ownUser.nbrNotifs = ownNbrNotif+1
+                    ownUser.nbrNotMyCode += 1
+                    ownUser.save()
+                sub.save()
+
+                #Create line comment and populate table
+                for comment, line_n in zip(lComments, lines_n):
+                    lineComment = LineComment.objects.create_lineComment(sub, review, line_n, comment)
+                    lineComment.save()
+
+            except BaseException, err:
+                #print '; '.join(err.__unicode__())
+                return render_to_response("rating.html", {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+        return HttpResponseRedirect('/submission/' + s_id)
+    else:
+        submission = Submission.objects.get(id=s_id)
+        code = submission.code
+        form = RatingForm()
+        return render_to_response('rating.html', {'form' : form, 'userCode' : code, 'lang': submission.language, 'nbrNot' : noti, 'MAX_RATING': settings.MAX_RATING}, context_instance=RequestContext(request))
+
+
+def register(request):
+    """
+        This view handles the user registration process
+    :param request: default parameter, http request
+    :return: a thankful message if all goes well.
+    """
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST)
+        if error_register(request) or not form.is_valid():
+            return render_to_response('signup.html', form, context_instance=RequestContext(request, {'form': form, 'navlog' : True}))
+        else:
+            username = request.POST['username']
+            email = request.POST['email']
+            password = request.POST['password1']
+            user = User.objects.create_user(username, email, password)
+            user.is_active = False
+            user.save()
+            #TODO : Randomize confirmation code
+            cRandom = random.random() * 711
+            confirmation_code = ''.join("RAMCO-") + str(cRandom)
+            p = Profile(user=user, confirmation_code=confirmation_code)
+            p.save()
+            send_registration_confirmation(user)
+            messages.success(request, 'Thank you for your registration. Please check your mails to activate your account.')
+            return HttpResponseRedirect('/login/')
+    else:
+        form = UserCreateForm()
+        return render_to_response('signup.html', form, context_instance=RequestContext(request, {'form': form, 'navlog' : True}))
+
+
+def send_registration_confirmation(user):
+    """
+        This method sends the confirmation link to the user address
+    :param user: the user.
+    """
+    p = user.get_profile()
+    title = "RAMCO account confirmation"
+    #TODO : redirect confirm on URLs
+    content = "Hi, thank you for registering. Here is your activation link: " \
+              "http://localhost:8000/confirm/" + str(p.confirmation_code) + "/" + user.username
+    send_mail(title, content, 'ramco.confirm@gmail.com', [user.email], fail_silently=False)
+
+
+def send_request_notification_mail(user, aReq):
+    """
+        This method is used to send a notification mail to the user
+        this notification is for a new Request.
+    :param user: the user to whom send the mail
+    :param aReq: the Request
+    """
+    aUser = User.objects.get(id=user)
+    p = aUser.get_profile()
+    title = "RAMCO request participation"
+    #TODO : redirect confirm on URLs
+    content = "Hi "+aUser.username+", "+aReq.user.username+" has requested your participation to a request \"" + aReq.title + "\". Here is the link to the request: " \
+              "http://localhost:8000/requestView/" + str(aReq.id)
+    if aReq.key:
+        content = content+"\nTo access this request you need this key: "+aReq.key
+    send_mail(title, content, 'ramco.confirm@gmail.com', [aUser.email], fail_silently=False)
+
+
+
+def confirm(request, confirmation_code, username):
+    """
+        This view is displayed when the confirmation link is clicked,
+        the user is activated if the two codes matches a message of success is printed.
+    :param request: default parameter, http request
+    :param confirmation_code: the confirmation code
+    :param username: the username of the user
+    :return: redirects to login on success
+    """
+    try:
+        user = User.objects.get(username=username)
+        profile = user.get_profile()
+        if profile.confirmation_code == confirmation_code and not user.is_active:
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Your account is now successfully active !')
+            return HttpResponseRedirect('/login/')
+        else:
+            return render_to_response("failed.html", {'thing': "your e-mail confirmation has failed"}, context_instance=RequestContext(request))
+    except:
+        return render_to_response("failed.html", {'thing': "your e-mail confirmation has failed"}, context_instance=RequestContext(request))
+
+
+def error_register(request):
+    """
+        This view is used in the email check.
+    :param request: default parameter, http request
+    :return: True if the email is erroneous.
+    """
+    username = request.POST['username']
+    password = request.POST['password1']
+    email = request.POST['email']
+    if username.replace(" ", "") == "" or password.replace(" ", "") == "":
+        return True
+    if len(username) > 15 or len(password) > 50:
+        return True
+    if not "@" in email:
+        return True
+    try:
+        if User.objects.get(username=username):
+            return True
+    except:
+        pass
+
+@login_required(login_url='/login/')
+def myReviews(request):
+    """
+        With this view the myReviews tab is created, a list of submission is
+        displayed.
+    :param request: default parameter, http request
+    :return: the myReviews page
+    """
+    noti = request.user.get_profile().nbrNotifs
+    user = request.user
+    submissions = Submission.objects.filter(user_id=user.id).order_by('id').reverse()[0:10]
+    notiRev = request.user.get_profile().nbrNotMyCode
+    notiReq = request.user.get_profile().nbrNotMyReq
+    notiCR = request.user.get_profile().nbrNotCrossR
+    #get all my reply to requests
+    reqAnswer = RequestAnswer.objects.filter(user=user)
+    crratingList= []
+    crratingList1= []
+    #for each requestAnswer get the crossRatings done on it
+    for req in reqAnswer:
+        crratings =CRRating.objects.filter(reqAnswer=req)
+        if crratings:
+            crratingList.append(crratings)
+    for crRat in crratingList:
+        for c in crRat:
+            crratingList1.append(c)
+    return render_to_response("myRevs.html", {'notiCR' : notiCR, 'notiReq' : notiReq, 'notiRev' : notiRev, 'navrevreq' : True, 'submissions' : submissions, 'nbrNot' : noti,  'crossRatings':crratingList1}, context_instance=RequestContext(request))
+    
+@login_required(login_url='/login/')
+def myRequests(request):
+    """
+        With this view the myRequest tab is created, a list of request is
+        displayed
+    :param request: default parameter, http request
+    :return: the myRequest page
+    """
+    noti = request.user.get_profile().nbrNotifs
+    notiRev = request.user.get_profile().nbrNotMyCode
+    notiReq = request.user.get_profile().nbrNotMyReq
+    notiCR = request.user.get_profile().nbrNotCrossR
+    user = request.user
+    requests = Request.objects.filter(user_id=user.id).order_by('id').reverse()[0:10]
+    return render_to_response("myReqs.html", {'notiCR' : notiCR, 'notiReq' : notiReq, 'notiRev' : notiRev, 'navrevreq' : True, 'requests' : requests, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+
+@login_required(login_url='/login/')
+def view_submission(request, s_id):
+    """
+        With this view we create the view page for a submission,
+        all the comments are printed.
+    :param request: default parameter, http request
+    :param s_id: the id of the submission
+    :return: the view page of a submission
+    """
+    try:
+        sub = Submission.objects.get(id=s_id)
+        sub.code.encode()
+        user = request.user
+        comments = Review.objects.filter(submission=sub).order_by('id').reverse()
+        line_comments = LineComment.objects.filter(submission=sub)
+        if sub is None:
+            noti = request.user.get_profile().nbrNotifs
+            return render_to_response("failed.html", {'thing': "the submission you are looking for does not exist", 'nbrNot' : noti}, context_instance=RequestContext(request))
+        else:
+            hasAlreadyCommented = False
+            if settings.MULTIPLE_COMMENT:
+                if Review.objects.filter(submission=sub, user=user):
+                    hasAlreadyCommented = True
+            if sub.ownerNotif and user.id==sub.user_id:
+                sub.ownerNotif = False
+                sub.save()
+                profile = Profile.objects.select_for_update().get(user_id=sub.user_id)
+                pNbrNotif = profile.nbrNotifs
+                profile.nbrNotifs = pNbrNotif-1
+                profile.nbrNotMyCode -= 1
+                profile.save()
+            noti = request.user.get_profile().nbrNotifs
+            return render_to_response("submView.html", {'sub': sub, 'comments': comments, 'MAX_RATING': settings.MAX_RATING, 'nbrNot' : noti, 'line_comments': line_comments, 'OWNER_COMMENT': settings.OWNER_COMMENT, 'hasAlreadyCommented': hasAlreadyCommented}, context_instance=RequestContext(request))
+    except:
+        noti = request.user.get_profile().nbrNotifs
+        return render_to_response("failed.html", {'thing': "the submission you are looking for does not exist", 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+
+@permission_required('view', (Request, 'id', 'req_id'))
+#@login_required(login_url='/login/')
+def view_request(request, req_id):
+    """
+        This view builts the view page for a request, the title code and language
+        are displayed. The user can reply to the request.
+        This page is restricted by the key access.
+
+    :param request: default parameter, http request
+    :param req_id: the id of the request
+    :return: if the user has access the view page of a request.
+    """
+    try:
+        aUser = request.user
+        if request.method == 'POST':
+            form = RequestAnswerForm(request.POST)
+            aRequest = Request.objects.get(id=req_id)
+            if not form.is_valid():
+                return render_to_response('reqView.html', {'aRequest': aRequest, 'form': form, 'aUser':aUser, }, context_instance=RequestContext(request))
+            #TODO Check form error
+            req = Request.objects.get(id=req_id)
+            #Check if the request is open
+            if req.state < '2':
+                if req.closing_type == '3':
+                    try:
+                        rUser = req.userList.get(username=aUser.username)
+                    except Exception,e:
+                        #print e
+                        return HttpResponseRedirect('/')
+                if req.closing_type == '1' or req.closing_type == '2':
+                    req.userList.add(aUser)
+                answer = RequestAnswer(user=aUser,code=form['code'].value(), request=req)
+                answer.save()
+                req.nbrOfReplies+=1
+                if req.nbrOfReplies == req.nbrOfRequiredSubs:
+                    req.state= 2
+                if not req.ownerNotif:
+                    req.ownerNotif = True
+                    userOwn = req.user.get_profile()
+                    userOwn.nbrNotMyReq +=1
+                    userOwn.nbrNotifs +=1
+                    userOwn.save()
+                req.save()
+                return render_to_response("thankyou.html", {'thing': "answer", 'redirect': "the request", 's_id': req.id, 'req':True},context_instance=RequestContext(request))
+            else:
+                return render_to_response("failed.html", {'thing': "this request is closed",}, context_instance=RequestContext(request))
+        else:
+            aRequest = Request.objects.get(id=req_id)
+            form = RequestAnswerForm()
+            reqFromUser = RequestAnswer.objects.filter(request=aRequest, user=request.user)
+            cantRespond = 1
+            if reqFromUser:
+                cantRespond = 0
+            if aRequest.closing_type == '3':
+                if not (request.user in aRequest.userList.all()):
+                    cantRespond = 0 
+            return render_to_response('reqView.html', {'aRequest': aRequest, 'form': form, 'aUser':aUser, 'noButton' : cantRespond}, context_instance=RequestContext(request))
+    except Exception, e:
+        #print e
+        return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+
+def profile(request):
+    return render_to_response('profile.html', context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def deleteReview(request,s_id, r_id):
+    """
+        This view is used to delete a review. (comment)
+    :param request: default parameter, http request
+    :param s_id: the id of the submission
+    :param r_id: the id of the comment (review)
+    :return: the view submission page without the comment
+    """
+    try:
+        user = request.user
+        review = Review.objects.filter(user=user, id=r_id)
+        if len(review) > 1:
+            return render_to_response("failed.html", {'thing': "Delete failed"}, context_instance=RequestContext(request))
+        if review:
+            sub = Submission.objects.select_for_update().get(id=s_id)
+            nbrC = sub.nbrComments
+            sub.nbrComments = nbrC-1
+            mean = sub.meanRating*nbrC
+            newMean = mean-review[0].rating
+            #Avoid division by 0
+            if sub.nbrComments == 0:
+                sub.meanRating = 0
+            else:
+                sub.meanRating = newMean/(nbrC-1)
+            sub.save()
+            review.delete()
+            return HttpResponseRedirect('/submission/'+s_id)
+        else:
+            return render_to_response("failed.html", {'thing': "Delete failed"}, context_instance=RequestContext(request))
+    except Exception, e:
+        #print e
+        return render_to_response("failed.html", {'thing': "the review you are looking for does not exist"}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def requestManagement(request, r_id):
+    """
+        This is the base management page, when the request is in state 1 and 2
+        A list of all submitted code is displayed (with the user who submitted it).
+    :param request: default parameter, http request
+    :param r_id: the id of the request
+    :return: the management page.
+    """
+    try:
+        aRequest = Request.objects.get(id=r_id)
+        if aRequest:
+            if aRequest.user == request.user and aRequest.ownerNotif:
+                aRequest.ownerNotif=False               
+                user = Profile.objects.select_for_update().get(user=request.user)
+                user.nbrNotifs -=1
+                user.nbrNotMyReq -=1
+                user.save()
+                aRequest.save()
+            noti = request.user.get_profile().nbrNotifs
+            return render_to_response('reqManagement.html', {'nbrNot' : noti, 'aRequest': aRequest}, context_instance=RequestContext(request))
+        else:
+            return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+    except Exception, e:
+        #print(e.message)
+        return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def getAnswerCode(request, r_id, u_id):
+    """
+        This method is used on a ajax call, it recuperates the code submitted in a request
+        by a user.
+    :param request: default parameter, http request
+    :param r_id: the id of the request
+    :param u_id: the id of the user
+    :return: a http response of type json, with the code.
+    """
+    if request.user == Request.objects.get(id=r_id).user:
+        try:
+            response_data = RequestAnswer.objects.get(request=r_id, user=u_id).code
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+        except:
+            #Not found
+            response_data = -1
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+    return HttpResponseRedirect('/login/')
+
+def close_request(request, r_id):
+    """
+        This view closes a request.
+    :param request: default parameter, http request
+    :param r_id: the id of the request
+    :return: the myRequest page
+    """
+    if request.user == Request.objects.get(id=r_id).user:
+        try:
+            aRequest = Request.objects.get(id=r_id)
+            if aRequest:
+                aRequest.state = 2
+                aRequest.save()
+                return HttpResponseRedirect('/myRequests/')
+            else:
+                return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+        except Exception, e:
+            #print e
+            return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+
+
+def start_cross_rating(request, req_id,nbCr):
+    #start cross rating
+    #fetch data
+    """
+        This method is used to start the cross rating of a request,
+        all the reply of the request are gathered and the assignation is done.
+    :param request: default parameter, http request
+    :param req_id: the id of the request
+    :param nbCr: the number of codes each user must rate
+    :return:
+    """
+    try:
+        req = Request.objects.get(id=req_id)
+        reqAnswers = []
+        reqAnswers = list(RequestAnswer.objects.filter(request=req))
+        reqAnswersCopy = list(reqAnswers)
+        if req:
+            userList=[]
+            #fill the list with users that have replied
+            for answer in reqAnswers:
+                userList.append(answer.user)
+            for user in userList:
+                userChoices = list()
+                for n in range(int(nbCr)):
+                    if reqAnswers:
+                        while True:
+                            selected_r= choice(reqAnswers)
+                            if selected_r.user != user:
+                                break
+                        userChoices.append(selected_r.user)
+                        crossRating = CrossRating(user=user,req=req, reqAnswer=selected_r)
+                        crossRating.save()
+                        #delete if queryset
+                        reqAnswers.remove(selected_r)
+                    else:
+                        while True:
+                            selected_r= choice(reqAnswersCopy)
+                            if (selected_r.user != user) and (not (selected_r.user in userChoices)):
+                                break
+                        userChoices.append(selected_r.user)
+                        crossRating = CrossRating(user=user,req=req, reqAnswer=selected_r)
+                        crossRating.save()
+                    userP = user.get_profile()
+                    userP.nbrNotCrossR += 1
+                    userP.nbrNotifs += 1
+                    userP.save()
+            req.state = 3
+            req.save()
+            return HttpResponseRedirect('/myRequests/')
+    except Exception, e:
+        #print(e)
+        return render_to_response("failed.html", {'thing': "cross rating has failed"}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def myCrossRating(request):
+    """
+        This view is the myCrossRating tab, a list of cross ratings
+        is displayed to the user
+    :param request: default parameter, http request
+    :return: page with cross-ratings
+    """
+    noti = request.user.get_profile().nbrNotifs
+    notiRev = request.user.get_profile().nbrNotMyCode
+    notiReq = request.user.get_profile().nbrNotMyReq
+    notiCR = request.user.get_profile().nbrNotCrossR
+    user = request.user
+    crossRating = CrossRating.objects.filter(user=user).exclude(wasRate=True).order_by('id').reverse()[0:10]
+    return render_to_response("myCrossRating.html", {'notiCR' : notiCR, 'notiReq' : notiReq, 'notiRev' : notiRev, 'navrevreq' : True, 'corssrating' : crossRating, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+def changelog(request):
+    return render_to_response('changelog.html', context_instance=RequestContext(request))
+
+def todo(request):
+    return render_to_response('todo.html', context_instance=RequestContext(request))
+
+def helpPage(request):
+    """
+        With this view we create the help page
+
+    :param request:i default parameter, http request
+    :return: the help page
+    """
+    nbrNo = 0
+    if request.user.is_authenticated():
+        nbrNo = request.user.get_profile().nbrNotifs
+    return render_to_response('help.html', {'navhelp': True, 'nbrNot' : nbrNo}, context_instance=RequestContext(request))
+
+def submissions(request):
+    """
+        This views buits the submission page, one list of
+        submission and one list of request.
+    :param request: default parameter, http request
+    :return: the submission page
+    """
+    noti = 0
+    if request.user.is_authenticated():
+        noti = request.user.get_profile().nbrNotifs
+    sub_list= Submission.objects.order_by('meanRating').reverse()[0:20]
+    #languages = Language.objects.all()
+    req_list = Request.objects.filter(state="1",key=None).exclude(closing_type='3')
+    return render_to_response('submissions.html', {'sub_list' : sub_list, 'nbrNot' : noti, 'navreviews' : True, 'req_list' : req_list}, context_instance=RequestContext(request))
+
+
+
+
+@login_required(login_url='/login/')
+def reqKey(request, r_id):
+    """
+        This view checks the inserted key with the request key
+        and grants the access to the user.
+    :param request: default parameter, http request
+    :param r_id: the id of the request.
+    :return: on POST redirects to the view page. On GET displays the form
+    """
+    try:
+        if request.method == 'POST':
+            form = KeyForm(request.POST)
+            key= form['key'].value()
+            req = Request.objects.get(id=r_id)
+            if req:
+                #if key is equal
+                if req.key == key:
+                    #add permission to user
+                    usr = User.objects.get(id=request.user.id)
+                    assign_perm('view', usr, req)
+                    usr.save()
+                    return HttpResponseRedirect('/requestView/'+r_id)
+        else:
+            form =KeyForm()
+            return render_to_response('insertKey.html', {'form': form}, context_instance=RequestContext(request))
+        return render_to_response('insertKey.html', context_instance=RequestContext(request))
+    except Exception, e:
+        #print(e)
+        return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def crossRating(request, rAns_id):
+    """
+        This view is used to do a cross rating, the user
+        is presented with the code to rate and all the tools to rate it.
+
+    :param request: default parameter, http request
+    :param rAns_id:
+    :return: on POST, the rating is done. On GET the form is presented.
+    """
+    if request.method == 'POST':
+        form = CrossRatingForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("crossRate.html", {'form': form,'MAX_RATING': settings.MAX_RATING}, context_instance=RequestContext(request))
+        else:
+            try:
+                lComments = request.POST.getlist('line_comment[comment]')
+                lines_n = request.POST.getlist('line_comment[line_n]')
+                crossRate = form.save(commit=False)
+                crossRate.user = request.user
+                crossRate.rating = form['rate'].value()
+                crossRate.reqAnswer = RequestAnswer.objects.get(id=rAns_id)
+                crossRate.notifOwn=True
+                userOwn = crossRate.reqAnswer.user.get_profile()
+                userOwn.nbrNotMyCode +=1
+                userOwn.nbrNotifs +=1
+                userOwn.save()
+                crossRate.save()
+                form.save()
+                tags = form['tagsList'].value()
+                for t in tags:
+                    t1 = TaggedReview(content_object=crossRate, tag=t)
+                    t1.save()
+
+                #Create line comment and populate table
+                for line_comment, line_n in zip(lComments, lines_n):
+                    lineComment = LineComment.objects.create_lineComment(None,None ,line_n=line_n, line_comment=line_comment, crrating=crossRate)
+                    lineComment.save()
+                xRating = CrossRating.objects.get(user=request.user, reqAnswer=rAns_id)
+                xRating.wasRate = True
+                xRating.save()
+                userP = request.user.get_profile()
+                userP.nbrNotCrossR -= 1
+                userP.nbrNotifs -= 1
+                userP.save()
+            except BaseException, err:
+                print(err.__unicode__())
+                return render_to_response("crossRate.html", {'form': form,}, context_instance=RequestContext(request))
+        return HttpResponseRedirect('/myCrossRating/')
+    else:
+        reqAnswer = RequestAnswer.objects.get(id=rAns_id)
+        code = reqAnswer.code
+        form = CrossRatingForm()
+        return render_to_response('crossRate.html', {'form' : form, 'userCode' : code,'aReq':reqAnswer.request, 'lang': reqAnswer.request.language,'MAX_RATING': settings.MAX_RATING}, context_instance=RequestContext(request))
+
+
+def view_requestCrossRatig(request, crrat_id):
+    """
+        This view is the result page of a cross rating, it shows
+        the code and the line comments and general comments.
+
+    :param request: default parameter, http request
+    :param crrat_id: the id of the Cross Rating Rating
+    :return: the page to view a cross rating result
+    """
+    try:
+        if request.method == 'GET':
+            crossRRating = CRRating.objects.get(id=crrat_id)
+            if crossRRating.notifOwn:
+                crossRRating.notifOwn=False
+                userP = request.user.get_profile()
+                userP.nbrNotifs -= 1
+                userP.nbrNotMyCode -= 1
+                userP.save()
+                crossRRating.save()
+            line_comments = LineComment.objects.filter(crrating=crossRRating)
+            aRequest = crossRRating.reqAnswer.request
+            return render_to_response('viewCrossRating.html', {'crossRating': crossRRating,'aRequest':aRequest, 'line_comments':line_comments}, context_instance=RequestContext(request))
+    except Exception, e:
+        print(e)
+        return render_to_response("failed.html", {'thing': "the cross rating you are looking for does not exist"}, context_instance=RequestContext(request))
+
+
+def view_link(request, reqId):
+    """
+        This view is the page the user sees after having submitted
+        a request, it contains the link to view the reuest.
+    :param request: default parameter, http request
+    :param reqId: the id of the Request
+    :return: page with link to request
+    """
+    try:
+        if request.method == 'GET':
+            aRequest = Request.objects.get(id=reqId)
+            return render_to_response('reqLink.html', {'req':aRequest, }, context_instance=RequestContext(request))
+    except Exception, e:
+        print(e)
+        return render_to_response("failed.html", {'thing': "the link you are looking for does not exist"}, context_instance=RequestContext(request))
+
+
+@login_required(login_url='/login/')
+def requestManagementCR(request, r_id):
+    """
+        This view is used when a request it's in cross-rating state.
+        A list of the cross-ratings done on this request is passed to the page.
+    :param request: default parameter, http request
+    :param r_id: the id of the Request
+    :return: the request management page with the list of cross ratings
+    """
+    try:
+        aRequest = Request.objects.get(id=r_id)
+        #get all my reply to requests
+        reqAnswer = RequestAnswer.objects.filter(request=aRequest)
+        crratingList= []
+        crratingList1= []
+        #for each requestAnswer get the crossRatings done on it
+        for req in reqAnswer:
+            crratings =CRRating.objects.filter(reqAnswer=req)
+            if crratings:
+                crratingList.append(crratings)
+        for crRat in crratingList:
+            for c in crRat:
+                crratingList1.append(c)
+        if aRequest:
+            return render_to_response('reqManagementCR.html', {'aRequest': aRequest, 'crossRatings':crratingList1}, context_instance=RequestContext(request))
+        else:
+            return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))
+    except Exception, e:
+        print(e.message)
+        return render_to_response("failed.html", {'thing': "the request you are looking for does not exist"}, context_instance=RequestContext(request))

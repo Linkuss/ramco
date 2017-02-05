@@ -1,0 +1,32 @@
+{% extends "index.html" %}
+
+{% block title %}View sumbission {{ sub.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ sub.title }}</h2>
+
+
+    <h4>Description: </h4>
+    <div class="well">
+        {{ sub.description }}
+    </div>
+    <br>
+
+    <h4>Code: </h4>
+
+    <div class="well">
+       <code>{{ sub.code }}</code>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block second %}
+
+    <h2>Comments will be put here</h2>
+
+{% endblock %}

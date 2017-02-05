@@ -1,0 +1,87 @@
+__author__ = 'vince'
+from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+
+class Profile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    confirmation_code = models.CharField(max_length=50)
+    nbrNotifs = models.IntegerField(default=0)
+    
+    
+class Language(models.Model):
+    Name = models.CharField(max_length=15)
+    
+class Tags(models.Model):
+    Name = models.CharField(max_length=15)
+    def __unicode__(self):
+        return self.Name
+
+
+class Submission(models.Model):
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=500)
+    language = models.ForeignKey(Language)
+    code = models.CharField(max_length=5000) #a changer, maybe more
+    date = models.DateField(auto_now=True)
+    user = models.ForeignKey(User)
+    meanRating = models.DecimalField(default=0, decimal_places=2, max_digits=4)
+    nbrComments = models.IntegerField(default=0)
+    ownerNotif = models.BooleanField(default=False)
+    
+    
+class ReqUserRequest(models.Model):
+    name = models.SlugField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    def __unicode__(self):
+        return self.tag
+    
+        
+class Request(models.Model):
+    title = models.CharField(max_length=50)
+    date = models.DateField(auto_now=True)
+    description = models.CharField(max_length=500)
+    language = models.ForeignKey(Language)
+    user = models.ForeignKey(User)
+    code = models.CharField(max_length=5000, blank=True, null=True)
+    nbrOfRequiredSubs = models.IntegerField(blank=True, null=True)
+    endDate = models.DateField(blank=True, null=True)
+    subList = generic.GenericRelation(ReqUserRequest, blank=True, null=True)
+    key = models.CharField(max_length=50, blank=True, null=True)
+    
+    
+    
+class TaggedReview(models.Model):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    def __unicode__(self):
+        return self.tag
+
+class Review(models.Model):
+    rating = models.IntegerField(default=0)
+    date = models.DateField(auto_now=True)
+    comment = models.CharField(max_length=1000)
+    code = models.CharField(max_length=5000, blank=True, null=True) #a changer, maybe more
+    user = models.ForeignKey(User)
+    submission = models.ForeignKey(Submission)
+    tagsList = generic.GenericRelation(TaggedReview)
+
+class LineCommentManager(models.Manager):
+    def create_lineComment(self, submission,review,line_n,line_comment):
+        lComment = self.create(submission=submission,review=review,line_n=line_n, line_comment=line_comment)
+        # do something with the book
+        return lComment
+
+class LineComment(models.Model):
+    submission = models.ForeignKey(Submission)
+    review = models.ForeignKey(Review)
+    line_n = models.IntegerField()
+    line_comment = models.CharField(max_length=5000)
+    objects = LineCommentManager()
+
+

@@ -1,0 +1,290 @@
+from django.core.signals import request_finished
+import random
+import datetime
+
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.contrib import auth
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+
+from decimal import *
+from forms import SubmitForm
+from forms import UserCreateForm
+from forms import RatingForm
+from forms import RequestForm
+from models import *
+
+from django.conf import settings
+
+from django.db.models.sql.datastructures import Date
+
+
+__author__ = 'vince'
+__author__ = 'tiago'
+
+
+def index(request):
+    sub_list= Submission.objects.order_by('id').reverse()[0:10]
+    noti = 0
+    if request.user.is_authenticated():
+        noti = request.user.get_profile().nbrNotifs
+    return render_to_response('index.html', {'sub_list': sub_list, 'navhome' : True, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def submitC(request):
+    noti = request.user.get_profile().nbrNotifs
+    if request.method == 'POST':
+        form = SubmitForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("submitCode.html", {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+        tit = str(form['title'].value())
+        desc = str(form['description'].value())
+        co = str(form['code'].value())
+        langF = form['language'].value()
+        lang = Language.objects.get(Name=langF)
+        username=request.user.username
+        user = User.objects.get(username=username)
+        sub = Submission(title=tit, code=co, description=desc, language=lang, user=user)
+        sub.save()
+        return render_to_response("thankyou.html", {'thing': "submission", 'redirect': "your submission", 's_id': sub.id, 'nbrNot' : noti},context_instance=RequestContext(request))
+    else:
+        form = SubmitForm()
+        return render_to_response('submitCode.html', {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def submitR(request):
+    noti = request.user.get_profile().nbrNotifs
+    if request.method == 'POST':
+        form = RequestForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("submitReq.html", {'form': form, 'nbrNot': noti}, context_instance=RequestContext(request))
+        tit = str(form['title'].value())
+        desc = str(form['description'].value())
+        co = str(form['code'].value())
+        langF = form['language'].value()
+        lang = Language.objects.get(Name=langF)
+        key = str(form['key'].value())
+        if key.__len__() == 0:
+            key = None
+        username=request.user.username
+        user = User.objects.get(username=username)
+        closureChoice = int(form['endingMethodRadio'].value())
+        if (closureChoice == 1):
+            nbrOfReqUsers = form['nbrOfRequiredSubs'].value()
+            req = Request(title=tit, description=desc, code=co, language=lang, user=user, nbrOfRequiredSubs=nbrOfReqUsers, key=key)
+            req.save()
+        elif (closureChoice == 2):
+            endDa = str(form['endDate'].value())
+            dateList = endDa.split("/")
+            dateF = "{0}-{1}-{2}".format(dateList[2], dateList[1], dateList[0])
+            req = Request(title=tit, description=desc, code=co, language=lang, user=user, endDate=dateF, key=key)
+            req.save()
+        else:
+            return render_to_response("submitReq.html", {'form': form, 'nbrNot': noti}, context_instance=RequestContext(request))
+        return render_to_response("thankyou.html", {'thing': "submission"}, context_instance=RequestContext(request))
+    form = RequestForm({'endingMethodRadio':'1'})
+    return render_to_response('submitReq.html', {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def rating(request, s_id):
+    noti = request.user.get_profile().nbrNotifs
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if not form.is_valid():
+            return render_to_response("rating.html", {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+        else:
+            try:
+                sub = Submission.objects.select_for_update().get(id=s_id)
+                lComments = request.POST.getlist('line_comment[comment]')
+                lines_n = request.POST.getlist('line_comment[line_n]')
+                review = form.save(commit=False)
+                review.user = request.user
+                review.submission = Submission.objects.get(id=s_id)
+                review.rating = form['rate'].value()
+                review.code = form['code'].value()
+                review.save()
+                form.save()
+                tags = form['tagsList'].value()
+                for t in tags:
+                    t1 = TaggedReview(content_object=review, tag=t)
+                    t1.save()
+                sub = Submission.objects.select_for_update().get(id=s_id)
+                oldR = sub.meanRating
+                oldNbrC = sub.nbrComments
+                newR = (oldR*oldNbrC + Decimal(review.rating)) / (oldNbrC+1)
+                sub.meanRating = Decimal(newR)
+                sub.nbrComments = oldNbrC+1
+                if not sub.ownerNotif:
+                    sub.ownerNotif = True
+                    ownUser = Profile.objects.select_for_update().get(user_id=sub.user_id)
+                    ownNbrNotif = ownUser.nbrNotifs
+                    ownUser.nbrNotifs = ownNbrNotif+1
+                    ownUser.save()
+                sub.save()
+
+                #Create line comment and populate table
+                for comment, line_n in zip(lComments, lines_n):
+                    lineComment = LineComment.objects.create_lineComment(sub, review, line_n, comment)
+                    lineComment.save()
+
+            except BaseException, err:
+                print '; '.join(err.__unicode__())
+                return render_to_response("rating.html", {'form': form, 'nbrNot' : noti}, context_instance=RequestContext(request))
+        return HttpResponseRedirect('/submission/' + s_id)
+    else:
+        submission = Submission.objects.get(id=s_id)
+        code = submission.code
+        user = User.objects.get(id = submission.user_id)
+        form = RatingForm()
+        return render_to_response('rating.html', {'form' : form, 'userCode' : code, 'lang': submission.language, 'nbrNot' : noti, 'MAX_RATING': settings.MAX_RATING}, context_instance=RequestContext(request))
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST)
+        if error_register(request) or not form.is_valid():
+            return render_to_response('signup.html', form, context_instance=RequestContext(request, {'form': form, 'navlog' : True}))
+        else:
+            username = request.POST['username']
+            email = request.POST['email']
+            password = request.POST['password1']
+            user = User.objects.create_user(username, email, password)
+            user.is_active = False
+            user.save()
+            #TODO : Randomize confirmation code
+            cRandom = random.random() * 711
+            confirmation_code = ''.join("RAMCO-") + str(cRandom)
+            p = Profile(user=user, confirmation_code=confirmation_code)
+            p.save()
+            send_registration_confirmation(user)
+            messages.success(request, 'Thank you for your registration. Please check your mails to activate your account.')
+            return HttpResponseRedirect('/login/')
+    else:
+        form = UserCreateForm()
+        return render_to_response('signup.html', form, context_instance=RequestContext(request, {'form': form, 'navlog' : True}))
+
+
+def send_registration_confirmation(user):
+    p = user.get_profile()
+    title = "RAMCO account confirmation"
+    #TODO : redirect confirm on URLs
+    content = "Hi, thank you for registering. Here is your activation link: " \
+              "http://localhost:8000/confirm/" + str(p.confirmation_code) + "/" + user.username
+    send_mail(title, content, 'ramco.confirm@gmail.com', [user.email], fail_silently=False)
+
+
+def confirm(request, confirmation_code, username):
+    try:
+        user = User.objects.get(username=username)
+        profile = user.get_profile()
+        if profile.confirmation_code == confirmation_code and not user.is_active:
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Your account is now successfully active !')
+            return HttpResponseRedirect('/login/')
+        else:
+            return render_to_response("failed.html", {'thing': "your e-mail confirmation"}, context_instance=RequestContext(request))
+    except:
+        return render_to_response("failed.html", {'thing': "your e-mail confirmation"}, context_instance=RequestContext(request))
+
+
+def error_register(request):
+    username = request.POST['username']
+    password = request.POST['password1']
+    email = request.POST['email']
+    if username.replace(" ", "") == "" or password.replace(" ", "") == "":
+        return True
+    if len(username) > 15 or len(password) > 50:
+        return True
+    if not "@" in email:
+        return True
+    try:
+        if User.objects.get(username=username):
+            return True
+    except:
+        pass
+
+@login_required(login_url='/login/')
+def myReviews(request):
+    noti = request.user.get_profile().nbrNotifs
+    user = request.user
+    submissions = Submission.objects.filter(user_id=user.id).order_by('id').reverse()[0:10]
+    return render_to_response("myRevs.html", {'navrevreq' : True, 'submissions' : submissions, 'nbrNot' : noti}, context_instance=RequestContext(request))
+    
+
+
+@login_required(login_url='/login/')
+def view_submission(request, s_id):
+    try:
+        sub = Submission.objects.get(id=s_id)
+        sub.code.encode()
+        user = request.user
+        comments = Review.objects.filter(submission=sub).order_by('id').reverse()
+        line_comments = LineComment.objects.filter(submission=sub)
+        if sub is None:
+            noti = request.user.get_profile().nbrNotifs
+            return render_to_response("failed.html", {'thing': "the submission you are looking for does not exist", 'nbrNot' : noti}, context_instance=RequestContext(request))
+        else:
+            hasAlreadyCommented = False
+            if settings.MULTIPLE_COMMENT:
+                if Review.objects.filter(submission=sub, user=user):
+                    hasAlreadyCommented = True
+            if sub.ownerNotif and user.id==sub.user_id:
+                sub.ownerNotif = False
+                sub.save()
+                profile = Profile.objects.select_for_update().get(user_id=sub.user_id)
+                pNbrNotif = profile.nbrNotifs
+                profile.nbrNotifs = pNbrNotif-1
+                profile.save()
+            noti = request.user.get_profile().nbrNotifs
+            return render_to_response("submView.html", {'sub': sub, 'comments': comments, 'MAX_RATING': settings.MAX_RATING, 'nbrNot' : noti, 'line_comments': line_comments, 'OWNER_COMMENT': settings.OWNER_COMMENT, 'hasAlreadyCommented': hasAlreadyCommented}, context_instance=RequestContext(request))
+    except:
+        noti = request.user.get_profile().nbrNotifs
+        return render_to_response("failed.html", {'thing': "the submission you are looking for does not exist", 'nbrNot' : noti}, context_instance=RequestContext(request))
+
+def view_request(request,req_id):
+    aRequest = Request.objects.get(id=req_id)
+
+
+    return render_to_response('rating.html', {'aRequest': aRequest}, context_instance=RequestContext(request))
+
+
+
+def profile(request):
+
+
+    return render_to_response('profile.html', context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def deleteReview(request,s_id, r_id):
+    try:
+        user = request.user
+        review = Review.objects.filter(user=user, id=r_id)
+        if len(review) > 1:
+            return render_to_response("failed.html", {'thing': "Delete failed"}, context_instance=RequestContext(request))
+        if review:
+            sub = Submission.objects.select_for_update().get(id=s_id)
+            nbrC = sub.nbrComments
+            sub.nbrComments = nbrC-1
+            mean = sub.meanRating*nbrC
+            newMean = mean-review[0].rating
+            sub.meanRating = newMean/(nbrC-1)
+            sub.save()
+            review.delete()
+            return HttpResponseRedirect('/submission/'+s_id)
+        else:
+            return render_to_response("failed.html", {'thing': "Delete failed"}, context_instance=RequestContext(request))
+    except:
+        return render_to_response("failed.html", {'thing': "the submission you are looking for does not exist"}, context_instance=RequestContext(request))
+
+
+
+def changelog(request):
+    return render_to_response('changelog.html')
+
+def todo(request):
+    return render_to_response('todo.html')

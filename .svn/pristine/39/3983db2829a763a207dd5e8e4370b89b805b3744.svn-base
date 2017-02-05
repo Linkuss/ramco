@@ -1,0 +1,47 @@
+{% extends "index.html" %}
+
+{% block title %}Login / Logout{% endblock %}
+
+{% block navbar %}
+    <div class="masthead">
+        <h3 class="muted">RAMCO - Rate My Code !</h3>
+        <div class="navbar">
+            <div class="navbar-inner">
+                <div class="container">
+                    <ul class="nav">
+                        <li><a href="../">Home</a></li>
+                        <li><a href="#">Reviews</a></li>
+                        <li><a href="#">MyReviews / MyRequests</a></li>
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li class="active"><a href="../login">Login / Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div><!-- /.navbar -->
+    </div>
+{% endblock %}
+
+
+{% block first %}
+
+    {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    <h1>Create an account</h1>
+
+   <!-- no action specified = same page with different method -->
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Create the account">
+    </form>
+
+
+{% endblock %}
+
+
+{% block second %}
+
+{% endblock %}

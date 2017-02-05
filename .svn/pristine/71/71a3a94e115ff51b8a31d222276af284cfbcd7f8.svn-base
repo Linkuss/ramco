@@ -1,0 +1,46 @@
+{% extends "index.html" %}
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+   <form action="" method="post">
+        {% csrf_token %}
+       {{ form.as_p }}
+        <input type="submit" class="btn btn-large btn-success" value="Send my comment">
+    </form>
+{% endblock %}
+
+
+{% block second %}
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true
+            });
+
+            var bt = document.getElementById("submit");
+
+            var area = document.getElementById("id_code");
+
+            $(bt).click(function(){
+                myCodeMirror.save();
+                area.value = myCodeMirror.getValue();
+            });
+
+
+
+
+        });
+    </script>
+
+
+
+{% endblock %}

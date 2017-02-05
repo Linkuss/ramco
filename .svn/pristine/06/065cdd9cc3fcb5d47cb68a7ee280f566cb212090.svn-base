@@ -1,0 +1,243 @@
+{% extends "index.html" %}
+{% load static %}
+{% block css %}
+
+.table th, .table td {
+border-top: none;
+}
+.hligh {background: #0F96F7;
+    color: #000000;}
+
+
+
+{% endblock %}
+
+
+{% block title %}View sumbission {{ sub.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ sub.title }} ({{ sub.meanRating }}/{{ MAX_RATING }})</h2>
+
+
+    <h4>Description: </h4>
+    <div id="description"  class="well">
+        {{ sub.description }}
+    </div>
+    <br>
+
+    <h4>Code: </h4>
+
+    <div id="code_container" class="row-fluid">
+        <div id="code1" class="span12"><textarea id="code"></textarea></div>
+
+
+
+       <pre class="hidden" style="display: none;">{{ sub.code }}</pre>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block second %}
+    <h3>Comments:</h3>
+    {% for comment in comments  %}
+
+        <div class="well">
+            <table class="table">
+                <tbody>
+                <!-- Results table headers -->
+                <tr>
+                    <td><h4>{{comment.user.username}}, the {{ comment.date }} commented:</h4></td>
+                    <td style="text-align: center"><h4>Rating:</h4></td>
+                </tr>
+                <tr>
+                    <td style="width:93%">{{ comment.comment }}</td>
+                    <td style="width:7%; text-align: center"><div id="rating" class="rating"><h2>{{ comment.rating }}</h2></div></td>
+                </tr>
+                {% if comment.tagsList.all %}
+                <tr>
+                	<td><h4>Tags : {% for t in comment.tagsList.all %}<span class="label">{{ t.tag }}</span> {% endfor %}</h4></td>
+                	<td style="text-align: center">{% if comment.code %}<button id="{{ comment.id }}" class="btn btn-info" type="button">Code</button>{% endif %}</td>
+                    <td id="c_code_{{ comment.id }}" class="hidden" style="display: none;">{{ comment.code }}</td>
+                </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    {% endfor %}
+{% endblock %}
+
+{% block third %}
+    <div class="title">
+        <a class="btn btn-large btn-success" href="rating">Add a comment</a>
+    </div>
+
+    <script type="text/javascript" src="{% get_static_prefix %}diff_javascript/diff_match_patch_uncompressed.js"></script>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        var mode = "{{ sub.language }}".toLowerCase();
+
+        var isAlreadyClicked = false;
+
+        $(document).ready(function(){
+
+            var code = $('pre').text();
+
+            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+
+
+            setMode(editor,mode);
+
+            editor.setValue(code);
+
+
+
+            editor.on("gutterClick", function(cm, n, gutter) {
+                if(gutter.localeCompare("CodeMirror-linenumbers") == 0){
+                    var nr = n+1;
+                    console.log("Line n°"+nr +" clicked");
+                } else {
+                    var info = cm.lineInfo(n);
+                    cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : makeMarker());
+                }
+            });
+
+            function makeMarker() {
+                var marker = document.createElement("div");
+                marker.style.color = "#822";
+                marker.innerHTML = "●";
+                return marker;
+            }
+            //Display sencond code on button click
+            $("button").click(function () {
+
+
+
+
+
+                var bt_id= $(this).attr("id");
+
+                if(isAlreadyClicked){
+                    isAlreadyClicked= false;
+                    $('#code2').remove();
+
+                }
+
+                isAlreadyClicked = true;
+
+                $('#code1').after( $("<div class='span6' id='code2'><textarea id='cm_code_2'></textarea></div>"));
+
+                $("#code1").removeClass("span12");
+
+                $("#code1").addClass("span6");
+
+
+                var editor2 = CodeMirror.fromTextArea(document.getElementById("cm_code_2"), {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    readOnly: true,
+                    mode: 'python',
+                    gutters: ["CodeMirror-linenumbers", "breakpoints"]
+                });
+
+                var code2 = $('#c_code_'+bt_id).text();
+                setMode(editor2,mode);
+
+
+                diffs = diff_lineMode(code,code2);
+
+
+                editor2.setValue(code2);
+
+                for(i=0; i<diffs.length;i++){
+                    if(diffs[i][0] == -1 || diffs[i][0] == 1){
+
+                       // console.log("lol"+i);
+                        editor2.addLineClass(i,"background","hligh");
+                    }
+
+                }
+
+                function wichLine(line){
+                    console.log(line);
+
+                }
+
+                editor2.doc.eachLine(wichLine());
+
+
+                console.log(diffs[0]); //get -1 etc
+                console.log(diffs[1]); //get -1 etc
+                console.log(diffs[2]); //get -1 etc
+                editor.setValue(code);
+
+                $(document.body).animate({
+                   'scrollTop':   $('#description').offset().top
+                }, 500);
+
+
+            });
+
+
+
+
+        });
+
+
+
+        function diff_lineMode(text1, text2) {
+            var dmp = new diff_match_patch();
+
+            var a = dmp.diff_linesToChars_(text1, text2);
+
+            var lineText1 = a['chars1'];
+            var lineText2 = a['chars2'];
+            var lineArray = a['lineArray'];
+
+            var diffs = dmp.diff_main(lineText1, lineText2, false);
+
+            dmp.diff_charsToLines_(diffs, lineArray);
+            // The first element specifies if it is an insertion (1), a deletion (-1) or an equality (0). The second element specifies the affected text.
+            return diffs;
+        }
+
+
+        function setMode(cm, mode) {
+            if(mode !== undefined) {
+                mode = mode.toLowerCase();
+
+
+                var script = '{% get_static_prefix %}codemirror/mode/'+mode+'/'+mode+'.js';
+
+                $.getScript(script, function() {
+
+                    cm.setOption('mode', mode);
+
+                }).fail(function(){
+                            console.log("script failed, fallback to clike");
+                            cm.setOption('mode', 'clike');
+                        });
+
+            }
+            else cm.setOption('mode', 'clike');
+        }
+
+
+    </script>
+
+
+{% endblock %}

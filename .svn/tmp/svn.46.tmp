@@ -1,0 +1,108 @@
+from cProfile import label
+from django import forms
+from django.forms.widgets import CheckboxSelectMultiple
+from django.forms.widgets import Textarea
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from models import Language
+from models import Tags
+from models import *
+from django.conf import settings
+from django.contrib.admin.widgets import FilteredSelectMultiple as FilteredSelectMultipleAdmin
+
+from lookups import UserLookup
+
+
+CHOICES_REQUEST = (('1', 'Number of responses',), ('2', 'Choose an end date ',), ('3', 'Select a list of users ',))
+
+class UserCreateForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    class Meta:
+        model = User
+        fields = ("username", "email", "password1", "password2")
+
+    def save(self, commit=True):
+        user = super(UserCreateForm, self).save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+        return user
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        username = self.cleaned_data.get('username')
+        if email and User.objects.filter(email=email).exclude(username=username).count():
+            raise forms.ValidationError(u'Email address already used.')
+        return email
+
+class RatingForm(forms.ModelForm):
+    rate = forms.ChoiceField(choices=[])
+    tagsList = forms.MultipleChoiceField(widget=CheckboxSelectMultiple(), required=False)
+    class Meta:
+        model = Review
+        exclude = ('user', 'tagsList', 'rating')
+        fields = ('comment','code')
+        widgets = {
+            'comment': Textarea(attrs={'rows': 4, 'class': 'row-fluid'}),
+            'code':  Textarea(attrs={'rows': 4, 'class': 'row-fluid'}),
+            }
+    def __init__(self, *args, **kwargs):
+        super(RatingForm, self).__init__(*args, **kwargs)
+        self.fields['comment'].label = u'Review of the code'
+        self.fields['tagsList'].label = u'Check the categories you think your review best fits in'
+        self.fields['code'].label = u'How you would have code it (Optional)'
+        self.fields['tagsList'].choices = Tags.objects.all().values_list("Name", "Name")
+        keys = xrange(1,settings.MAX_RATING+1)
+        self.fields['rate'].choices = zip(keys, keys)
+        self.fields['rate'].widget.attrs['style']='width:50px'
+        self.fields['rate'].label = u'Rate this code :'
+        
+    def clean_rating(self):
+        rating = self.cleaned_data.get('rating')
+        if rating<0 or rating>settings.MAX_RATING:
+            raise forms.ValidationError(u'Rating must be positive and smaller than 10')
+        return rating
+
+
+
+class SubmitForm(forms.Form):
+    title = forms.CharField()
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 4, 'class' : 'row-fluid'}))
+    language = forms.ChoiceField(choices=[])
+    code = forms.CharField(widget=forms.Textarea(attrs={'rows': 4, 'class' : 'row-fluid'}))
+    #init definition tforms.ModelFormo populate the language combobox
+    def __init__(self, *args, **kwargs):
+        super(SubmitForm, self).__init__(*args, **kwargs)
+        self.fields['language'].choices = Language.objects.all().values_list("Name","Name")
+        self.fields['language'].widget.attrs['style']='width:150px'
+        
+        
+class RequestForm(forms.ModelForm):
+    language = forms.ChoiceField(choices=[])
+    endingMethodRadio = forms.ChoiceField(widget=forms.RadioSelect(), choices=CHOICES_REQUEST, required=False)
+    userList = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False, widget=FilteredSelectMultipleAdmin("Users", False))
+    class Meta:
+        model = Request
+        exclude = 'userList'
+        fields = ('title', 'description', 'nbrOfRequiredSubs', 'code', 'endDate', 'key',)
+        widgets = {
+            'description': Textarea(attrs={'rows': 4, 'class': 'row-fluid'}),
+
+        }
+    def __init__(self, *args, **kwargs):
+        super(RequestForm, self).__init__(*args, **kwargs)
+        self.fields['language'].choices = Language.objects.all().values_list("Name","Name")
+        self.fields['language'].widget.attrs['style']='width:150px'
+        self.fields['endDate'].widget.attrs['disabled']="true"
+        self.fields['endDate'].widget.attrs['class']="span8"
+        self.fields['endingMethodRadio'].widget.attrs['id']="endMethod"
+
+class RequestAnswerForm(forms.ModelForm):
+    class Meta:
+        model = RequestAnswer
+        exclude = 'date, request'
+        fields = ('code',)
+        widgets = {
+            'code': Textarea(attrs={'rows': 4, 'class': 'row-fluid'}),
+        }
+

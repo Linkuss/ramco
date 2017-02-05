@@ -1,0 +1,91 @@
+{% extends "index.html" %}
+{% load static %}
+{% block title %}Help{% endblock %}
+{% block tagBody %}<body data-spy="scroll" data-target=".bs-docs-sidebar">{% endblock %}
+{% block first %}
+
+    <!-- Docs nav
+    ================================================== -->
+    <div class="row">
+      <div class="span3 bs-docs-sidebar" >
+        <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="110">
+          <li><a href="#intro"><i class="icon-chevron-right"></i>Introduction</a></li>
+          <li><a href="#submit-code"><i class="icon-chevron-right"></i>Submit your code</a></li>
+          <li><a href="#rating-code"><i class="icon-chevron-right"></i>Code rating and comments</a></li>
+          <li><a href="#request"><i class="icon-chevron-right"></i>Submit a request</a></li>
+          <li><a href="#cross-rating"><i class="icon-chevron-right"></i>Cross-Rating</a></li>
+        </ul>
+      </div>
+      <div id="content" class="span9">
+    	 <section id="intro">
+    	 	<div class="page-header">
+            	<h1>Introduction</h1>
+          	</div>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ante quis justo lacinia varius vitae a mauris. Suspendisse sodales vulputate vehicula. Proin mollis metus vitae risus sagittis faucibus tempus orci pulvinar. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque molestie auctor sem sodales pellentesque. Maecenas aliquam metus eget nisl bibendum fringilla. Nunc interdum quam sit amet nunc dignissim posuere. Duis pretium consequat elit vel tempus.
+
+Fusce non pulvinar metus. Cras hendrerit ligula venenatis sem sodales non accumsan nibh tristique. Praesent at augue ut mauris ultrices laoreet vitae sit amet tortor. Sed et felis non sem fermentum mattis tristique ac orci. Proin nibh erat, imperdiet et malesuada eget, porttitor ac mauris. Quisque vel odio quis neque adipiscing suscipit. Sed elementum ante feugiat nibh egestas sodales. Aenean in velit id lorem cursus tempor vel molestie neque. Integer sapien enim, euismod ut mollis eu, semper vel leo. Integer mollis tempus nibh vel posuere. Nulla facilisi.
+
+Mauris dolor urna, commodo vitae congue ut, scelerisque non metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse eget egestas augue. Nulla odio dui, egestas molestie egestas a, elementum non ante. Proin ut vulputate quam. Sed odio nisl, tincidunt sit amet cursus a, egestas ac tellus. Vestibulum at felis et nisi elementum lobortis non in nunc. Suspendisse bibendum enim ac mauris sagittis vulputate.
+		 </section>
+		 <section id="submit-code">
+    	 	<div class="page-header">
+            	<h1>Submit your code</h1>
+          	</div>
+In ac nisi sem. Maecenas semper lorem vitae ante mattis ultrices. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus justo, ornare in euismod a, luctus laoreet libero. Proin pulvinar neque in nulla porta eget fermentum nunc adipiscing. Nulla in auctor augue. Donec orci dolor, venenatis sit amet bibendum ac, tempus non nibh. Cras vulputate erat eget nunc placerat vestibulum. Morbi mauris erat, bibendum quis lobortis eget, vehicula in magna.
+
+Nulla augue elit, rhoncus sed malesuada et, fringilla ut velit. Nullam mollis tristique tortor, eu cursus eros tristique sed. Fusce justo eros, sagittis in luctus at, iaculis ac lacus. In eget libero ut nibh luctus lacinia. Maecenas lacinia nunc non felis interdum pretium. Quisque egestas accumsan felis a lacinia. Donec ullamcorper velit sed ipsum condimentum tempor. 
+		 </section>
+		 <section id="rating-code">
+    	 	<div class="page-header">
+            	<h1>Code rating and comments</h1>
+          	</div>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ante quis justo lacinia varius vitae a mauris. Suspendisse sodales vulputate vehicula. Proin mollis metus vitae risus sagittis faucibus tempus orci pulvinar. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque molestie auctor sem sodales pellentesque. Maecenas aliquam metus eget nisl bibendum fringilla. Nunc interdum quam sit amet nunc dignissim posuere. Duis pretium consequat elit vel tempus.
+
+Fusce non pulvinar metus. Cras hendrerit ligula venenatis sem sodales non accumsan nibh tristique. Praesent at augue ut mauris ultrices laoreet vitae sit amet tortor. Sed et felis non sem fermentum mattis tristique ac orci. Proin nibh erat, imperdiet et malesuada eget, porttitor ac mauris. Quisque vel odio quis neque adipiscing suscipit. Sed elementum ante feugiat nibh egestas sodales. Aenean in velit id lorem cursus tempor vel molestie neque. Integer sapien enim, euismod ut mollis eu, semper vel leo. Integer mollis tempus nibh vel posuere. Nulla facilisi.
+
+Mauris dolor urna, commodo vitae congue ut, scelerisque non metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse eget egestas augue. Nulla odio dui, egestas molestie egestas a, elementum non ante. Proin ut vulputate quam. Sed odio nisl, tincidunt sit amet cursus a, egestas ac tellus. Vestibulum at felis et nisi elementum lobortis non in nunc. Suspendisse bibendum enim ac mauris sagittis vulputate.
+		 </section>
+		 <section id="request">
+    	 	<div class="page-header">
+            	<h1>Submit a request</h1>
+          	</div>
+In ac nisi sem. Maecenas semper lorem vitae ante mattis ultrices. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus justo, ornare in euismod a, luctus laoreet libero. Proin pulvinar neque in nulla porta eget fermentum nunc adipiscing. Nulla in auctor augue. Donec orci dolor, venenatis sit amet bibendum ac, tempus non nibh. Cras vulputate erat eget nunc placerat vestibulum. Morbi mauris erat, bibendum quis lobortis eget, vehicula in magna.
+
+Nulla augue elit, rhoncus sed malesuada et, fringilla ut velit. Nullam mollis tristique tortor, eu cursus eros tristique sed. Fusce justo eros, sagittis in luctus at, iaculis ac lacus. In eget libero ut nibh luctus lacinia. Maecenas lacinia nunc non felis interdum pretium. Quisque egestas accumsan felis a lacinia. Donec ullamcorper velit sed ipsum condimentum tempor. 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ante quis justo lacinia varius vitae a mauris. Suspendisse sodales vulputate vehicula. Proin mollis metus vitae risus sagittis faucibus tempus orci pulvinar. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque molestie auctor sem sodales pellentesque. Maecenas aliquam metus eget nisl bibendum fringilla. Nunc interdum quam sit amet nunc dignissim posuere. Duis pretium consequat elit vel tempus.
+
+Fusce non pulvinar metus. Cras hendrerit ligula venenatis sem sodales non accumsan nibh tristique. Praesent at augue ut mauris ultrices laoreet vitae sit amet tortor. Sed et felis non sem fermentum mattis tristique ac orci. Proin nibh erat, imperdiet et malesuada eget, porttitor ac mauris. Quisque vel odio quis neque adipiscing suscipit. Sed elementum ante feugiat nibh egestas sodales. Aenean in velit id lorem cursus tempor vel molestie neque. Integer sapien enim, euismod ut mollis eu, semper vel leo. Integer mollis tempus nibh vel posuere. Nulla facilisi.
+		 </section>
+		 <section id="cross-rating">
+    	 	<div class="page-header">
+            	<h1>Cross-Rating</h1>
+          	</div>
+Mauris dolor urna, commodo vitae congue ut, scelerisque non metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse eget egestas augue. Nulla odio dui, egestas molestie egestas a, elementum non ante. Proin ut vulputate quam. Sed odio nisl, tincidunt sit amet cursus a, egestas ac tellus. Vestibulum at felis et nisi elementum lobortis non in nunc. Suspendisse bibendum enim ac mauris sagittis vulputate.
+
+In ac nisi sem. Maecenas semper lorem vitae ante mattis ultrices. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus justo, ornare in euismod a, luctus laoreet libero. Proin pulvinar neque in nulla porta eget fermentum nunc adipiscing. Nulla in auctor augue. Donec orci dolor, venenatis sit amet bibendum ac, tempus non nibh. Cras vulputate erat eget nunc placerat vestibulum. Morbi mauris erat, bibendum quis lobortis eget, vehicula in magna.
+
+Nulla augue elit, rhoncus sed malesuada et, fringilla ut velit. Nullam mollis tristique tortor, eu cursus eros tristique sed. Fusce justo eros, sagittis in luctus at, iaculis ac lacus. In eget libero ut nibh luctus lacinia. Maecenas lacinia nunc non felis interdum pretium. Quisque egestas accumsan felis a lacinia. Donec ullamcorper velit sed ipsum condimentum tempor. 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ante quis justo lacinia varius vitae a mauris. Suspendisse sodales vulputate vehicula. Proin mollis metus vitae risus sagittis faucibus tempus orci pulvinar. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Pellentesque molestie auctor sem sodales pellentesque. Maecenas aliquam metus eget nisl bibendum fringilla. Nunc interdum quam sit amet nunc dignissim posuere. Duis pretium consequat elit vel tempus.
+
+Fusce non pulvinar metus. Cras hendrerit ligula venenatis sem sodales non accumsan nibh tristique. Praesent at augue ut mauris ultrices laoreet vitae sit amet tortor. Sed et felis non sem fermentum mattis tristique ac orci. Proin nibh erat, imperdiet et malesuada eget, porttitor ac mauris. Quisque vel odio quis neque adipiscing suscipit. Sed elementum ante feugiat nibh egestas sodales. Aenean in velit id lorem cursus tempor vel molestie neque. Integer sapien enim, euismod ut mollis eu, semper vel leo. Integer mollis tempus nibh vel posuere. Nulla facilisi.
+
+Mauris dolor urna, commodo vitae congue ut, scelerisque non metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse eget egestas augue. Nulla odio dui, egestas molestie egestas a, elementum non ante. Proin ut vulputate quam. Sed odio nisl, tincidunt sit amet cursus a, egestas ac tellus. Vestibulum at felis et nisi elementum lobortis non in nunc. Suspendisse bibendum enim ac mauris sagittis vulputate.
+
+In ac nisi sem. Maecenas semper lorem vitae ante mattis ultrices. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tellus justo, ornare in euismod a, luctus laoreet libero. Proin pulvinar neque in nulla porta eget fermentum nunc adipiscing. Nulla in auctor augue. Donec orci dolor, venenatis sit amet bibendum ac, tempus non nibh. Cras vulputate erat eget nunc placerat vestibulum. Morbi mauris erat, bibendum quis lobortis eget, vehicula in magna.
+
+Nulla augue elit, rhoncus sed malesuada et, fringilla ut velit. Nullam mollis tristique tortor, eu cursus eros tristique sed. Fusce justo eros, sagittis in luctus at, iaculis ac lacus. In eget libero ut nibh luctus lacinia. Maecenas lacinia nunc non felis interdum pretium. Quisque egestas accumsan felis a lacinia. Donec ullamcorper velit sed ipsum condimentum tempor.
+		 </section> 
+      </div>
+    </div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block third %}{% endblock %}
+{% block javascript %}
+	<script type="text/javascript" language="javascript" >
+        /*$(document).ready(function(){
+			$('#content').scrollspy();
+		});*/
+	</script>​
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}My Reviews / Requests{% endblock %}
+
+{% block first %}
+	<ul class="nav nav-tabs">
+    	<li class="active"><a href="{% url 'my Reviews' %}">My codes</a></li>
+    	<li><a href="{% url 'my Requests' %}">My Requests{% if notiReq %} (new){% endif %}</a></li>
+    	<li><a href="{% url 'myCrossRating' %}">Cross-Rating{% if notiCR %} (new){% endif %}</a></li>
+    </ul>
+    <div id="table_container">
+    {% if submissions %}
+ 	<table class="table table-striped table-hover table-bordered">
+		<thead>
+	    	<tr class="info">
+	        	<th>Language</th>
+	            <th>Title</th>
+	            <th>Rating</th>
+	            <th>Submitted</th>
+	            <th>Nb. of comments</th>
+	        </tr>
+	    </thead>
+	    	<tbody>
+	        {% for sub in submissions  %}
+	        	<tr class="pointer">
+	            		<td class="s_id" style="display: none;">{{ sub.id }}</td>
+	                	<td>{{ sub.language.Name }}</td>
+	                    <td>{{ sub.title }}</td>
+	                    <td>{{ sub.meanRating|floatformat:"-2" }}</td>
+	                    <td>{{ sub.date }}</td>
+                        <td>{{ sub.nbrComments }}{% if sub.ownerNotif %} <span class="label label-info"> <b>new comment(s) !</b></span>{% endif %}</td>
+	            </tr>
+	         {% endfor %}
+	        </tbody>
+     </table>
+     {% else %}
+     	<div class="alert alert-info"><h4>No Submissions yet !</h4></div>
+	 {% endif %}
+	</div>
+{% endblock %}
+
+
+{% block second %}
+    {% if not submissions %}
+
+        <div class="alert alert-block">
+            <strong>Click <a href="{% url 'submit code' %}">here</a> to create your first submission</strong>
+        </div>
+
+    {% endif %}
+	
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            $('tr').click(function() {
+
+
+                var $cell=$(this).closest('tr');
+
+                var id = $(this).closest('tr').children('td.s_id').text();
+                if( !$cell.hasClass('info')){
+                    window.location.href = "../submission/"+id;
+                }
+            });
+
+        });
+    </script>
+ {% endblock %}

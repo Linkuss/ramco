@@ -1,0 +1,206 @@
+{% extends "index.html" %}
+{% load static %}
+{% load tag_range %}
+{% block css %}
+
+{% endblock %}
+
+
+{% block title %}Manage request - {{ aRequest.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ aRequest.title }}</h2>
+
+
+    <h4>Description: </h4>
+    <div id="description"  class="well well-small">
+        {{ aRequest.description }}
+    </div>
+
+{% endblock %}
+
+
+{% block second %}
+    <h4>Submitted codes {% if aRequest.nbrOfRequiredSubs %}({{ aRequest.nbrOfReplies }} / {{ aRequest.nbrOfRequiredSubs }}): {% else %} ({{ aRequest.nbrOfReplies }}): {% endif %} </h4>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr class="info">
+            <th>Username</th>
+            <th>Code</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for rUser in aRequest.userList.all  %}
+            <tr>
+                <td class="u_id" style="display: none;">{{ rUser.id }}</td>
+                <td class="u_name" style="width: 80%">{{ rUser.username }}</td>
+                <td style="width: 20%; text-align: center"> <div id="noCodePop"  data-toggle="popover" title=""><button name="getCode" class="btn btn-primary"  type="button">View code</button> </div></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block third %}
+
+    <div class="title" style="text-align: center">
+        {% if aRequest.state < 2 %}<button class="btn btn-primary" id="closeReq"  type="button">Close this request</button>{% endif %}
+
+        {% if aRequest.state != 3 %}<button class="btn btn-primary" id="startCR" type="button">Start cross-rating</button>{% endif %}
+    </div>
+
+
+    <!-- Modal -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Start Cross-Rating</h3>
+        </div>
+        <div class="modal-body">
+            <div class="alert">
+                <strong>Warning!</strong> This action will close the request.
+            </div>
+
+            There are {{ aRequest.nbrOfReplies }} answers to your request, please select the number of codes one must rate:
+            <div class="btn-group">
+                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                    0
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    {% for i in aRequest.nbrOfReplies|get_range %}
+                        <li>{{ i }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button id="saveBT" class="btn btn-primary">Start Cross-Rating</button>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="myModalCode" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel1">View user code</h3>
+        </div>
+        <div class="modal-body">
+            <textarea id="id_code"></textarea>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            var req_id = '{{ aRequest.id }}';
+
+            var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("id_code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                mode: "text/x-java"
+            });
+
+            $('#startCR').click(function(){
+
+                $('#myModal').modal("show");
+
+            });
+
+            $('#saveBT').click(function(){
+
+               //TODO start cross rating
+
+            });
+
+            $('#closeReq').click(function(){
+
+                window.location.href = "../../closeRequest/"+req_id;
+
+            });
+
+
+
+            $(":button[name='getCode']").click(function(){
+                var id = $(this).closest('tr').children('td.u_id').text();
+                var username = $(this).closest('tr').children('td.u_name').text();
+                var csrftoken = getCookie('csrftoken');
+
+                $('#myModalLabel1').text(username+"'s code:");
+
+
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+
+                    }
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../getRequestAnswerCode/"+req_id+"/"+id+"/",
+                    dataType: "json",
+                    success: function ( JSONdata ) {
+                        if(JSONdata == -1){
+                            $("#noCodePop").popover({ title: 'No code submitted yet'});
+                            $("#noCodePop").popover("show");
+                        } else {
+                            myCodeMirror.setValue(JSONdata);
+
+                            $('#myModalCode').modal("show");
+                            //refresh after changing size
+                            myCodeMirror.refresh();
+
+                        }
+                    },
+                    error: function () {
+                        console.log("error");
+                    }
+                });
+
+
+
+            });
+
+
+            // using jQuery get csrf cookie
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+
+        });
+
+    </script>
+
+
+{% endblock %}

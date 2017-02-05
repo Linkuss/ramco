@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+
+{% block title %}Submission{% endblock %}
+
+{% block first %}
+   <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Rate my code">
+    </form>
+{% endblock %}
+
+
+{% block second %}
+
+{% endblock %}

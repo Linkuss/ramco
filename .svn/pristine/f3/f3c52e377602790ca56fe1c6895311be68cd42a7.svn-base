@@ -1,0 +1,117 @@
+{% extends "index.html" %}
+
+{% block css %}
+
+.table th, .table td {
+border-top: none;
+}
+
+
+
+{% endblock %}
+
+
+{% block title %}View sumbission {{ sub.title }}{% endblock %}
+
+{% block first %}
+
+
+    <h2 class="title">{{ sub.title }} ({{ sub.meanRating }}/{{ MAX_RATING }})</h2>
+
+
+    <h4>Description: </h4>
+    <div class="well">
+        {{ sub.description }}
+    </div>
+    <br>
+
+    <h4>Code: </h4>
+
+    <div>
+        <textarea id="code" class="prettyprint" style="display: none;">"></textarea>
+
+
+       <pre class="hidden">{{ sub.code }}</pre>
+    </div>
+
+
+
+{% endblock %}
+
+
+{% block second %}
+    <h3>Comments:</h3>
+    {% for comment in comments  %}
+
+        <div class="well">
+            <table class="table">
+                <tbody>
+                <!-- Results table headers -->
+                <tr>
+                    <td><h4>{{comment.user.username}}, the {{ comment.date }} commented:</h4></td>
+                    <td>Rating:</td>
+                </tr>
+                <tr>
+                    <td style="width:93%">{{ comment.comment }}</td>
+                    <td style="width:7%"><div id="rating" class="rating"><h2>{{ comment.rating }}</h2></div></td>
+                </tr>
+                <tr>
+                	<td><h4>Tags : {% for t in comment.tagsList.all %}<span class="label">{{ t.tag }}</span> {% endfor %}</h4></td>
+                	<td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    {% endfor %}
+{% endblock %}
+
+{% block third %}
+    <div class="title">
+        <a class="btn btn-large btn-success" href="rating">Add a comment</a>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+            var code = $('pre').text();
+
+            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                matchBrackets: true,
+                readOnly: true,
+                mode: 'python',
+                gutters: ["CodeMirror-linenumbers", "breakpoints"]
+            });
+
+            editor.setValue(code);
+
+
+
+            editor.on("gutterClick", function(cm, n, gutter) {
+                if(gutter.localeCompare("CodeMirror-linenumbers") == 0){
+                    var nr = n+1;
+                    console.log("Line n°"+nr +" clicked");
+                } else {
+                    var info = cm.lineInfo(n);
+                    cm.setGutterMarker(n, "breakpoints", info.gutterMarkers ? null : makeMarker());
+                }
+            });
+
+            function makeMarker() {
+                var marker = document.createElement("div");
+                marker.style.color = "#822";
+                marker.innerHTML = "●";
+                return marker;
+            }
+
+
+        });
+    </script>
+
+
+{% endblock %}

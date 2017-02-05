@@ -1,0 +1,102 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Help{% endblock %}
+{% block forHelpPage %}{% endblock %}
+{% block css %}
+{% endblock %}
+{% block tagBody %}<body class="body" data-spy="scroll" data-target=".bs-docs-sidebar">{% endblock %}
+{% block first %}
+	<div class="row-fluid">
+      <div class="span3 bs-docs-sidebar" >
+        <ul class="nav nav-list bs-docs-sidenav" data-spy="affix" data-offset-top="100">
+          <li><a href="#intro"><i class="icon-chevron-right"></i>Introduction</a></li>
+          <li><a href="#submit-code"><i class="icon-chevron-right"></i>Submit your code</a></li>
+          <li><a href="#rating-code"><i class="icon-chevron-right"></i>Code rating and comments</a></li>
+          <li><a href="#view-comments"><i class="icon-chevron-right"></i>View comments</a></li>
+          <li><a href="#request"><i class="icon-chevron-right"></i>Submit a request</a></li>
+          <li><a href="#cross-rating"><i class="icon-chevron-right"></i>Cross-Rating</a></li>
+        </ul>
+      </div>
+      <div class="span9">
+    	 <section id="intro">
+    	 	<div class="page-header">
+            	<h1>Introduction</h1>
+          	</div>
+			<p>This site was done as a project for the spring semester of 2013 by Vincenzo Do and Tiago De Deus. The idea of it is to give to the school, and in the future to open communities, the opportunity to do code rating easily and efficiently. Another task given to us was to implement a way to use the rating system of the site to allow programming online courses to have a solution in correcting the exercises.  As you may know, these online courses can have thousands of students in one course and it's impossible for the teacher to correct them all. This is the reason why with our site you can do what we call cross-rating. A person does a request; people submit their code to the request. The person who has done the request can then activate the cross-rating and everyone who submitted a code will have several codes of other persons who also submitted to rate. In the next sections, we will explain how you can utilize these 2 features: the traditional code rating and the Request/Cross-Rating mechanism.</p>
+		 </section>
+		 <section id="submit-code">
+    	 	<div class="page-header">
+            	<h1>Submit your code</h1>
+          	</div>
+			<p>To submit your code you can click on the "Rate my Code" button on the main's page carousel.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image1.png"></div>
+			<br>
+			<p>Once you're in the submission page, make sure that you submit your code for rating and don't do a submission. You can find out more information about the request function lower in this page.</p>
+			<div align="center">img src="{% get_static_prefix %}img/helpPage/image2.png"></p></div>
+			<br>
+			<p>On the submission page you have to fill out multiple fields. The <font color="red">Title</font> field is just that, the title for your code. Keep in mind that this is one of the fields that will be seen on home page and the Submission's page. You should try to make your title clear and informative to incite other users to come and rate your code. Next is the <font color="blue">Description</font> field. Try to provide as much information as possible about your code here. People who rate your code will have an easier time giving useful critics if they now the context surrounding your code.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image3.png"></div>
+			<br>
+			<p>You now have to select the language in which your code is written, it not only helps other users situate your code but it will also change the syntax highlighting of the code so please choose the good language.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image4.png"></div>
+			<br>
+			<p>Finally you have to fill the most important field, the <font color="orange">Code</font> field. This is where you put the code you want other users to rate. Please remember that code rating is supposed to be a tool to improve your code and your coding skills but is not made to finish a method. You should be confident about your code when you submit it.</p>
+			<div align="center"><img src="{% get_static_prefix %}img/helpPage/image5.png"></div>
+			<br>
+		 </section>
+		 <section id="rating-code">
+    	 	<div class="page-header">
+            	<h1>Code rating and comments</h1>
+          	</div>
+          	<p>Of course submitting your code for other users to rate is awesome, but rating someone else's code is also part of the fun.</p>
+          	<p>When you watch the code submitted by another user, you can see at the bottom of the page a button to add a comment. This will open the page to rate his code.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image6.png"></div>
+			<br>
+          	<p>At the top of the page, you will see the code of the user. In here you can click on the <font color="green">line number column</font> to put a comment on a specific line. A pop up will appear where you can put your comment. </p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image7.png"></div>
+			<br>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image8.png"></div>
+			<br>
+          	<p>Please keep it short as it is just a quick comment on a line, for a more detailed comment use the next field. In here you can do your general review of the code and give advices to improve the code.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image9.png"></div>
+			<br>
+          	<p>The next field is optional; here you can put how you would have code the code of the user. You can use this field to demonstrate something you have explained in the previous field for example or just to demonstrate an alternative way to code the same method/class.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image10.png"></div>
+			<br>
+          	<p>Finally you need to give a <font color="red">score</font> to the code you're reviewing and, to help categorize your review, you can check whatever <font color="blue">categories</font> your review fits in. You can choose to give no category to your review by simply leave every choice unchecked.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image11.png"></div>
+			<br>
+		 </section>
+		 <section id="view-comments">
+    	 	<div class="page-header">
+            	<h1>View commments</h1>
+          	</div>
+          	<p>Once your code has received comments, you will see them easily on your submission's page. First you will see the blue dots next to some line numbers. These are the line comments. If you put your mouse cursor on them, a tooltip will appear with the name of the user who commented and the comment.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image12.png"></div>
+			<br>
+          	<p>Bellow your code you will see the reviews. You can see there the <font color="green">review</font> of the person, the <font color="orange">score </font> this person has given to the code and optionally you can also see the <font color="red">tags</font> corresponding to the categories this user thinks it's review best fits in and a button "compare code" if the user as given his version of the code.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image13.png"></div>
+			<br>
+          	<p>If you click on this button, next to the original code will appear the reviewer's code. The differences between the two codes will be highlighted in blue. To close the other user's code, you can click on the <font color="red">close button</font>.</p>
+          	<div align="center"><img src="{% get_static_prefix %}img/helpPage/image14.png">  </div>
+			<br>        	
+		 </section>
+		 <section id="request">
+    	 	<div class="page-header">
+            	<h1>Submit a request</h1>
+          	</div>
+          	text
+		 </section>
+		 <section id="cross-rating">
+    	 	<div class="page-header">
+            	<h1>Cross-Rating</h1>
+          	</div>
+          	text
+		 </section> 
+      </div>
+    </div>
+{% endblock %}
+{% block second %}{% endblock %}
+{% block javascript %}
+{% endblock %}

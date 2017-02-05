@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+
+
+{% block title %}Thank you{% endblock %}
+
+{% block first %}
+
+<h3>Thank you {{ user.username }} for your {{ thing }}, you will be redirected to {{ redirect }} shortly.</h3>
+
+{% endblock %}
+
+{% block second %}
+
+{% endblock %}

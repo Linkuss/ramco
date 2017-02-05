@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}My CrossRating{% endblock %}
+
+{% block first %}
+    <ul class="nav nav-tabs">
+        <li ><a href="{% url 'my Reviews' %}">My codes</a></li>
+        <li><a href="{% url 'my Requests' %}">My Requests</a></li>
+        <li class="active"><a href="{% url 'myCrossRating' %}">Cross-Rating</a></li>
+    </ul>
+    <div id="table_container">
+        {% if corssrating %}
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                <tr class="info">
+                    <th>Request title</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cross in corssrating  %}
+                    <tr class="pointer">
+                        <td class="ra_id" style="display: none;">{{ cross.reqAnswer.id }}</td>
+                        <td>{{ cross.req.title }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info"><h4>No Cross Rating yet !</h4></div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+{% block second %}
+    {% if not corssrating %}
+
+        <div class="alert alert-block">
+            <strong>Click <a href="{% url 'submit code' %}">here</a> to create your first submission</strong>
+        </div>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript" language="javascript" >
+
+        $(document).ready(function(){
+
+         /**   $('tr').click(function() {
+
+
+                var $cell=$(this).closest('tr');
+
+                var id = $(this).closest('tr').children('td.ra_id').text();
+                if( !$cell.hasClass('info')){
+                    window.location.href = "../submission/"+id;
+                }
+            });**/
+
+        });
+    </script>
+{% endblock %}
